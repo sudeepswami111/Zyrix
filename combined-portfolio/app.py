@@ -8,6 +8,7 @@
 
 import os
 import uuid
+import logging
 import numpy as np
 import pandas as pd
 import joblib
@@ -16,6 +17,13 @@ from PIL import Image
 
 # Suppress TensorFlow INFO messages in console
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
+# Configure structured logging so Render's log panel shows clear messages
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 # ── Flask Application Setup ──────────────────────────────────────────────────
 app = Flask(__name__)
@@ -42,11 +50,11 @@ try:
         house_model = house_bundle["model"]
         house_scaler = house_bundle["scaler"]
         house_model_name = type(house_model).__name__
-        print(f"[LOADED] House model: {house_model_name}")
+        logger.info(f"[LOADED] House model: {house_model_name}")
     else:
-        print(f"[WARNING] House model not found at {HOUSE_MODEL_PATH}")
+        logger.warning(f"[WARNING] House model not found at {HOUSE_MODEL_PATH}")
 except Exception as e:
-    print(f"[ERROR] Failed to load house model: {e}")
+    logger.error(f"[ERROR] Failed to load house model: {e}", exc_info=True)
 
 
 # =============================================================================
@@ -63,11 +71,11 @@ try:
     if os.path.exists(SENTIMENT_MODEL_PATH) and os.path.exists(VECTORIZER_PATH):
         sentiment_model = joblib.load(SENTIMENT_MODEL_PATH)
         sentiment_vectorizer = joblib.load(VECTORIZER_PATH)
-        print(f"[LOADED] Sentiment model and vectorizer loaded successfully")
+        logger.info("[LOADED] Sentiment model and vectorizer loaded successfully")
     else:
-        print("[WARNING] Sentiment model or vectorizer not found in models/")
+        logger.warning("[WARNING] Sentiment model or vectorizer not found in models/")
 except Exception as e:
-    print(f"[ERROR] Failed to load sentiment model: {e}")
+    logger.error(f"[ERROR] Failed to load sentiment model: {e}", exc_info=True)
 
 
 # =============================================================================
@@ -87,16 +95,17 @@ def load_image_model():
         return True
     try:
         if os.path.exists(IMAGE_MODEL_PATH):
+            logger.info("[IMAGE] TensorFlow import starting — this may take 10-30 seconds...")
             import tensorflow as tf
             from tensorflow import keras
             image_model = keras.models.load_model(IMAGE_MODEL_PATH)
-            print(f"[LOADED] Image CNN model loaded successfully")
+            logger.info("[LOADED] Image CNN model loaded successfully")
             return True
         else:
-            print(f"[WARNING] Image model not found at {IMAGE_MODEL_PATH}")
+            logger.warning(f"[WARNING] Image model not found at {IMAGE_MODEL_PATH}")
             return False
     except Exception as e:
-        print(f"[ERROR] Failed to load image model: {e}")
+        logger.error(f"[ERROR] Failed to load image model: {e}", exc_info=True)
         return False
 
 
@@ -133,6 +142,7 @@ def house_price():
             error = "House prediction model is not loaded."
         else:
             try:
+                logger.info("[HOUSE] Prediction request received")
                 # 1. Parse form inputs
                 raw = {}
                 for col in FEATURE_COLS:
@@ -150,6 +160,7 @@ def house_price():
                 pred_100k = house_model.predict(X_scaled)[0]
                 pred_100k = max(0.5, pred_100k)   # Floor prediction at $50,000
                 pred_usd = pred_100k * 100_000
+                logger.info(f"[HOUSE] Prediction successful: ${pred_usd:,.0f}")
 
                 prediction = {
                     "dollars": f"${pred_usd:,.0f}",
@@ -161,7 +172,9 @@ def house_price():
 
             except ValueError as e:
                 error = f"Invalid input: {e}. Please ensure all entries are numbers."
+                logger.warning(f"[HOUSE] ValueError: {e}")
             except Exception as e:
+                logger.error(f"[HOUSE] Unexpected prediction error: {e}", exc_info=True)
                 error = f"Prediction error: {str(e)}"
 
     return render_template(
@@ -192,6 +205,7 @@ def sentiment():
             error = "Sentiment classification model is not loaded."
         else:
             try:
+                logger.info(f"[SENTIMENT] Classifying text of length {len(user_text)}")
                 # 1. Transform input text using the vocabulary learned during training
                 text_vector = sentiment_vectorizer.transform([user_text])
 
@@ -206,8 +220,10 @@ def sentiment():
                 prediction = "Positive" if raw_label == "positive" else "Negative"
                 conf_score = prob_positive if raw_label == "positive" else prob_negative
                 confidence = round(conf_score * 100, 1)
+                logger.info(f"[SENTIMENT] Result: {prediction} ({confidence}%)")
 
             except Exception as e:
+                logger.error(f"[SENTIMENT] Classification error: {e}", exc_info=True)
                 error = f"Classification error: {str(e)}"
 
     return render_template(
@@ -240,8 +256,10 @@ def image_classifier():
     image_url = None
     error = None
 
-    # Load image model lazily to ensure startup is fast
-    model_loaded = load_image_model()
+    # Do NOT load the TensorFlow model on every GET request.
+    # Only attempt to load it when the user actually submits an image (POST).
+    # This prevents the gunicorn worker from timing out during normal page loads.
+    model_loaded = (image_model is not None)  # Quick check — no I/O
 
     if request.method == "POST":
         if "image" not in request.files:
@@ -253,31 +271,42 @@ def image_classifier():
                 error = "No image selected. Please choose a file."
             elif not allowed_file(file.filename):
                 error = "Unsupported image format. Please upload PNG, JPG, JPEG, BMP or WEBP."
-            elif not model_loaded:
-                error = "CNN Classifier model is not loaded."
             else:
-                try:
-                    # Save uploaded file with unique filename to prevent namespace collision
-                    ext = file.filename.rsplit(".", 1)[1].lower()
-                    filename = f"{uuid.uuid4().hex}.{ext}"
-                    save_path = os.path.join(UPLOAD_FOLDER, filename)
-                    file.save(save_path)
+                # Lazy-load TensorFlow only when a POST with an image arrives.
+                # This defers the 10-30s TF import cost to the FIRST prediction,
+                # instead of blocking every server startup or page load.
+                if not model_loaded:
+                    logger.info("[IMAGE] First POST received — triggering lazy model load")
+                    model_loaded = load_image_model()
 
-                    image_url = url_for("static", filename=f"uploads/{filename}")
+                if not model_loaded:
+                    error = "CNN Classifier model could not be loaded. Check server logs."
+                else:
+                    try:
+                        logger.info(f"[IMAGE] Processing uploaded file: {file.filename}")
+                        # Save uploaded file with unique filename to prevent namespace collision
+                        ext = file.filename.rsplit(".", 1)[1].lower()
+                        filename = f"{uuid.uuid4().hex}.{ext}"
+                        save_path = os.path.join(UPLOAD_FOLDER, filename)
+                        file.save(save_path)
 
-                    # Preprocess and predict
-                    img_input = preprocess_image(save_path)
-                    raw_output = image_model.predict(img_input, verbose=0)[0][0]
+                        image_url = url_for("static", filename=f"uploads/{filename}")
 
-                    pred_class = 1 if raw_output > 0.5 else 0
-                    prediction = CLASS_LABELS[pred_class]
+                        # Preprocess and predict
+                        img_input = preprocess_image(save_path)
+                        raw_output = image_model.predict(img_input, verbose=0)[0][0]
 
-                    # Confidence represents certainty in predicted class
-                    conf_score = float(raw_output) if pred_class == 1 else float(1 - raw_output)
-                    confidence = round(conf_score * 100, 1)
+                        pred_class = 1 if raw_output > 0.5 else 0
+                        prediction = CLASS_LABELS[pred_class]
 
-                except Exception as e:
-                    error = f"Prediction error: {str(e)}"
+                        # Confidence represents certainty in predicted class
+                        conf_score = float(raw_output) if pred_class == 1 else float(1 - raw_output)
+                        confidence = round(conf_score * 100, 1)
+                        logger.info(f"[IMAGE] Prediction: {prediction} ({confidence}%)")
+
+                    except Exception as e:
+                        logger.error(f"[IMAGE] Prediction error: {e}", exc_info=True)
+                        error = f"Prediction error: {str(e)}"
 
     return render_template(
         "image_classifier.html",
@@ -290,8 +319,7 @@ def image_classifier():
 
 # ── Run Development Server ───────────────────────────────────────────────────
 if __name__ == "__main__":
-    # Pre-warm image model load check
-    load_image_model()
-    
-    print("\n[START] Combined ML Portfolio starting on http://127.0.0.1:5000")
+    # Do NOT pre-warm the image model here — let it load lazily on first POST.
+    # Pre-warming would block Flask startup for 10-30s on every dev restart.
+    logger.info("[START] Combined ML Portfolio starting on http://127.0.0.1:5000")
     app.run(debug=True, host="0.0.0.0", port=5000)
