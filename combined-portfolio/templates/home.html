@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}ML Portfolio — Home{% endblock %}
+
+{% block content %}
+<header class="header">
+  <div class="badge">Model Hub &nbsp;|&nbsp; Local Inference</div>
+  <h1>Machine Learning<br/>Project Portfolio</h1>
+  <p class="header-sub">
+    A combined collection of three distinct ML tasks ranging from traditional regression 
+    to deep neural networks. All models are trained locally and execute inside your browser.
+  </p>
+</header>
+
+<div class="portfolio-grid">
+  <!-- Card 1: House Price -->
+  <a href="{{ url_for('house_price') }}" class="portfolio-card">
+    <div class="portfolio-icon">🏠</div>
+    <div class="portfolio-title">House Price Predictor</div>
+    <p class="portfolio-desc">
+      An advanced regression model trained on the real California Housing dataset (20,640 records). 
+      Predicts median house value based on block-level statistics.
+    </p>
+    <div class="portfolio-meta">
+      <span>Task: <strong>Regression</strong></span>
+      <span class="algo">Random Forest</span>
+    </div>
+  </a>
+
+  <!-- Card 2: Sentiment Classifier -->
+  <a href="{{ url_for('sentiment') }}" class="portfolio-card">
+    <div class="portfolio-icon">💬</div>
+    <div class="portfolio-title">Sentiment Classifier</div>
+    <p class="portfolio-desc">
+      A binary text classifier that parses sentence structures and categorises them as 
+      Positive or Negative sentiment. Shows confidence scores.
+    </p>
+    <div class="portfolio-meta">
+      <span>Task: <strong>NLP / Classification</strong></span>
+      <span class="algo">TF-IDF + Logistic</span>
+    </div>
+  </a>
+
+  <!-- Card 3: Image CNN -->
+  <a href="{{ url_for('image_classifier') }}" class="portfolio-card">
+    <div class="portfolio-icon">✈️</div>
+    <div class="portfolio-title">Image Classifier (CNN)</div>
+    <p class="portfolio-desc">
+      A deep Convolutional Neural Network built with Keras and trained on the CIFAR-10 dataset 
+      to distinguish between Airplanes and Automobiles.
+    </p>
+    <div class="portfolio-meta">
+      <span>Task: <strong>Computer Vision</strong></span>
+      <span class="algo">2-Layer CNN</span>
+    </div>
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Machine Learning Portfolio{% endblock %}</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Link to the shared stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+  <div class="page">
+    <!-- Shared Navigation Bar -->
+    <nav class="navbar">
+      <a href="{{ url_for('home') }}" class="nav-brand">ML Portfolio</a>
+      <ul class="nav-links">
+        <li class="{% if request.endpoint == 'home' %}active{% endif %}">
+          <a href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="{% if request.endpoint == 'house_price' %}active{% endif %}">
+          <a href="{{ url_for('house_price') }}">House Price</a>
+        </li>
+        <li class="{% if request.endpoint == 'sentiment' %}active{% endif %}">
+          <a href="{{ url_for('sentiment') }}">Sentiment</a>
+        </li>
+        <li class="{% if request.endpoint == 'image_classifier' %}active{% endif %}">
+          <a href="{{ url_for('image_classifier') }}">Image CNN</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Page Specific Content Block -->
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  {% block scripts %}
+  {% endblock %}
+</body>
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Classifier — CNN Demo</title>
+  <meta name="description" content="A beginner-friendly CNN image classifier demo. Upload any image and the model predicts Airplane or Automobile with a confidence score." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:          #07090f;
+      --bg-card:     rgba(255,255,255,0.04);
+      --border:      rgba(255,255,255,0.08);
+      --accent:      #6c63ff;
+      --accent2:     #f9a826;
+      --text-1:      #eef0ff;
+      --text-2:      #8a94b2;
+      --text-3:      #40496a;
+      --input-bg:    rgba(255,255,255,0.04);
+      --success:     #43e97b;
+      --warning:     #f9a826;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(108,99,255,0.18), transparent 70%);
+      top: -150px; left: -150px;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: pulse 12s ease-in-out infinite alternate;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(249,168,38,0.12), transparent 70%);
+      bottom: -100px; right: -100px;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: pulse 16s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes pulse {
+      from { transform: scale(1) translate(0,0); }
+      to   { transform: scale(1.2) translate(30px, 40px); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 2.4rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.28);
+      color: #a89dff;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.32rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.2rem;
+    }
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.9rem, 5vw, 2.8rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #eef0ff 30%, #a89dff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      margin-bottom: 0.8rem;
+    }
+    .header p {
+      color: var(--text-2);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .header p code {
+      background: rgba(108,99,255,0.14);
+      color: #a89dff;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 2.5rem 2.2rem;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03) inset, 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 1rem;
+    }
+
+    /* Upload drop zone */
+    .drop-zone {
+      border: 2px dashed rgba(108,99,255,0.35);
+      border-radius: 16px;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s;
+      position: relative;
+      background: rgba(108,99,255,0.04);
+      margin-bottom: 1.4rem;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: rgba(108,99,255,0.7);
+      background: rgba(108,99,255,0.09);
+    }
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .drop-icon { font-size: 2.8rem; margin-bottom: 0.8rem; line-height: 1; }
+    .drop-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: 0.4rem;
+    }
+    .drop-sub {
+      font-size: 0.8rem;
+      color: var(--text-3);
+    }
+    /* Image preview inside drop zone */
+    #preview-img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 10px;
+      margin: 0.8rem auto 0;
+      display: none;
+      border: 2px solid rgba(108,99,255,0.3);
+    }
+    #file-name {
+      font-size: 0.78rem;
+      color: var(--text-2);
+      margin-top: 0.5rem;
+    }
+
+    /* Classes info */
+    .classes-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .class-chip {
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.85rem;
+    }
+    .class-chip .chip-icon { font-size: 1.5rem; }
+    .class-chip .chip-label { font-weight: 600; }
+    .class-chip .chip-sub { font-size: 0.72rem; color: var(--text-3); }
+
+    /* Submit button */
+    .btn-classify {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #6c63ff, #a855f7);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 4px 22px rgba(108,99,255,0.4);
+    }
+    .btn-classify:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108,99,255,0.55); }
+    .btn-classify:active { transform: translateY(0); }
+    .btn-classify:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Result card */
+    .result-card {
+      margin-top: 1.8rem;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(108,99,255,0.25);
+      animation: fadeUp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+
+    .result-layout {
+      display: flex;
+      gap: 0;
+    }
+
+    /* Uploaded image panel */
+    .result-img-panel {
+      width: 140px;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .result-img-panel img {
+      width: 100%;
+      border-radius: 8px;
+      image-rendering: pixelated; /* preserve CIFAR-10 pixel art look */
+    }
+
+    /* Prediction panel */
+    .result-info {
+      flex: 1;
+      padding: 1.5rem 1.8rem;
+      background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(168,85,247,0.04));
+    }
+    .result-tag {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #a89dff;
+      margin-bottom: 0.4rem;
+    }
+    .result-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Confidence bar */
+    .conf-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-2);
+      margin-bottom: 0.4rem;
+    }
+    .conf-val { font-weight: 700; color: var(--text-1); }
+    .bar-track {
+      height: 8px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 0.8rem;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #6c63ff, #a855f7);
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .result-note {
+      font-size: 0.75rem;
+      color: var(--text-3);
+      line-height: 1.55;
+    }
+
+    /* Error card */
+    .error-card {
+      margin-top: 1.5rem;
+      background: rgba(255,101,132,0.07);
+      border: 1px solid rgba(255,101,132,0.2);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+      font-size: 0.88rem;
+      color: #ff9ab5;
+    }
+
+    /* Architecture explainer */
+    .arch-section {
+      margin-top: 2rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem 1.8rem;
+    }
+    .arch-section h3 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 1.1rem;
+    }
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+    }
+    .arch-block {
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.25);
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.75rem;
+      color: #c4bfff;
+      white-space: nowrap;
+    }
+    .arch-arrow {
+      color: var(--text-3);
+      font-size: 0.75rem;
+      padding: 0 0.3rem;
+    }
+    .arch-note {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: var(--text-2);
+      line-height: 1.6;
+    }
+    .arch-note strong { color: var(--text-1); }
+
+    @media (max-width: 500px) {
+      .card { padding: 1.8rem 1.2rem; }
+      .result-layout { flex-direction: column; }
+      .result-img-panel { width: 100%; height: 140px; }
+      .classes-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="badge">CNN Demo &nbsp;|&nbsp; CIFAR-10 Binary Classifier</div>
+    <h1>Image Classifier</h1>
+    <p>
+      Upload any image — the CNN model trained from scratch on
+      <code>CIFAR-10</code> will predict whether it shows an
+      <strong>Airplane</strong> or <strong>Automobile</strong>
+      and give you its confidence score.
+    </p>
+  </header>
+
+  <div class="card">
+    <p class="section-label">What can this model classify?</p>
+    <div class="classes-row">
+      <div class="class-chip">
+        <span class="chip-icon">✈</span>
+        <div>
+          <div class="chip-label">Airplane</div>
+          <div class="chip-sub">Class 0 &mdash; output &lt; 0.5</div>
+        </div>
+      </div>
+      <div class="class-chip">
+        <span class="chip-icon">🚗</span>
+        <div>
+          <div class="chip-label">Automobile</div>
+          <div class="chip-sub">Class 1 &mdash; output &gt; 0.5</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-label">Upload an image</p>
+
+    <form method="POST" action="/" enctype="multipart/form-data" id="uploadForm">
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" name="image" id="fileInput" accept="image/*" required />
+        <div class="drop-icon" id="dropIcon">&#128247;</div>
+        <div class="drop-title" id="dropTitle">Click to upload or drag & drop</div>
+        <div class="drop-sub" id="dropSub">PNG, JPG, JPEG, BMP, WEBP &mdash; any size</div>
+        <img id="preview-img" src="" alt="Preview" />
+        <div id="file-name"></div>
+      </div>
+
+      <button type="submit" class="btn-classify" id="classifyBtn">
+        Classify Image
+      </button>
+
+    </form>
+
+    {#
+      RESULT SECTION:
+        Jinja2 renders this block only when Flask sends a prediction value.
+        if/endif = conditional rendering (like Python if statements)
+        {{ variable }} = inject Python variable value into the HTML
+    #}
+    {% if prediction is not none %}
+    <div class="result-card">
+      <div class="result-layout">
+
+        {% if image_url %}
+        <div class="result-img-panel">
+          <img src="{{ image_url }}" alt="Uploaded image" />
+        </div>
+        {% endif %}
+
+        <div class="result-info">
+          <div class="result-tag">CNN Prediction</div>
+          <div class="result-label">{{ prediction }}</div>
+
+          <div class="conf-row">
+            <span>Model Confidence</span>
+            <span class="conf-val">{{ confidence }}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{ confidence }}%;"></div>
+          </div>
+
+          <div class="result-note">
+            {% if confidence >= 85 %}
+            High confidence prediction. The model found strong visual features
+            matching the {{ prediction }} class.
+            {% elif confidence >= 65 %}
+            Moderate confidence. The image has some features of {{ prediction }}
+            but also some ambiguity.
+            {% else %}
+            Low confidence (&lt; 65%). The image may be ambiguous, very different
+            from the 32x32 training images, or might not be an airplane or automobile at all.
+            {% endif %}
+            <br /><br />
+            Note: this model was trained on <strong>32x32 pixel</strong> CIFAR-10 images.
+            Your uploaded image was automatically resized to 32x32 before prediction.
+          </div>
+        </div>
+
+      </div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error-card">{{ error }}</div>
+    {% endif %}
+
+  </div>
+
+  <!-- CNN Architecture explainer -->
+  <div class="arch-section">
+    <h3>CNN Architecture used for this classifier</h3>
+    <div class="arch-flow">
+      <span class="arch-block">Input<br/>32x32x3</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">Conv2D<br/>32 filters</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">MaxPool<br/>16x16</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">Conv2D<br/>64 filters</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">MaxPool<br/>8x8</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">Flatten<br/>4096 vals</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">Dense<br/>64 neurons</span>
+      <span class="arch-arrow">&#8594;</span>
+      <span class="arch-block">Output<br/>Sigmoid</span>
+    </div>
+    <div class="arch-note">
+      <strong>Conv2D</strong> slides small 3x3 filters across the image, learning to detect
+      edges, shapes, and textures. <strong>MaxPooling</strong> halves the spatial size, making
+      the network faster and more robust to small position shifts.
+      <strong>Sigmoid</strong> outputs a number between 0 and 1: closer to 1 = Automobile,
+      closer to 0 = Airplane.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const fileInput = document.getElementById("fileInput");
+  const preview   = document.getElementById("preview-img");
+  const dropZone  = document.getElementById("dropZone");
+  const dropIcon  = document.getElementById("dropIcon");
+  const dropTitle = document.getElementById("dropTitle");
+  const dropSub   = document.getElementById("dropSub");
+  const fileNameEl= document.getElementById("file-name");
+  const btn       = document.getElementById("classifyBtn");
+
+  // Show image preview when a file is selected
+  fileInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = "block";
+      dropIcon.style.display = "none";
+      dropTitle.textContent  = "Image selected";
+      fileNameEl.textContent = file.name;
+      btn.disabled = false;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Drag-and-drop highlight
+  ["dragenter", "dragover"].forEach(evt =>
+    dropZone.addEventListener(evt, () => dropZone.classList.add("drag-over"))
+  );
+  ["dragleave", "drop"].forEach(evt =>
+    dropZone.addEventListener(evt, () => dropZone.classList.remove("drag-over"))
+  );
+
+  // Show loading state on submit
+  document.getElementById("uploadForm").addEventListener("submit", function() {
+    btn.disabled = true;
+    btn.textContent = "Classifying...";
+  });
+</script>
+
+</body>
+</html>

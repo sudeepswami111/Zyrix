@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}ML Portfolio — Sentiment Classifier{% endblock %}
+
+{% block content %}
+<header class="header">
+  <div class="badge">ML Demo &nbsp;|&nbsp; Logistic Regression + TF-IDF</div>
+  <h1>Sentiment Classifier</h1>
+  <p class="header-sub">
+    Type any review sentence below. The model — trained from scratch using
+    <code>scikit-learn</code> on 48 real reviews — will classify it as
+    Positive or Negative and show its confidence.
+  </p>
+</header>
+
+<div class="card">
+  <p class="card-title">Enter Your Review</p>
+
+  <form method="POST" action="{{ url_for('sentiment') }}" id="sentimentForm">
+    <div class="field" style="position: relative; margin-bottom: 1.4rem;">
+      <textarea
+        id="user_text"
+        name="user_text"
+        placeholder="e.g. This product is absolutely incredible, best I have ever used!"
+        maxlength="500"
+        required
+      >{{ user_text }}</textarea>
+      <span class="char-count" id="charCount" style="position: absolute; bottom: 0.6rem; right: 1rem; font-size: 0.7rem; color: var(--text-3); pointer-events: none;">0 / 500</span>
+    </div>
+
+    <p style="font-size: 0.72rem; color: var(--text-3); margin-bottom: 0.55rem; font-weight: 500;">Quick examples (click to fill):</p>
+    <div class="pills" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.6rem;">
+      <span class="pill" onclick="fillText(this)">This movie was an absolute masterpiece</span>
+      <span class="pill" onclick="fillText(this)">Terrible quality, broke after one day</span>
+      <span class="pill" onclick="fillText(this)">The packaging was damaged on arrival</span>
+      <span class="pill" onclick="fillText(this)">Loved every single minute of it</span>
+      <span class="pill" onclick="fillText(this)">Boring and completely overrated</span>
+      <span class="pill" onclick="fillText(this)">Excellent sound and very comfortable</span>
+    </div>
+
+    <button type="submit" class="btn" id="analyzeBtn">
+      Analyze Sentiment
+    </button>
+  </form>
+
+  {% if prediction is not none %}
+  <div class="result-card {% if prediction == 'Negative' %}negative{% endif %}">
+    <div class="result-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <div class="result-emoji" style="font-size: 2.6rem; line-height: 1;">
+        {% if prediction == "Positive" %}:){% else %}:({% endif %}
+      </div>
+      <div>
+        <div class="result-tag" style="margin-bottom: 0.25rem;">Predicted Sentiment</div>
+        <div class="result-val" style="font-size: 2.2rem; margin-bottom: 0;">{{ prediction }}</div>
+      </div>
+    </div>
+
+    <div class="conf-row">
+      <span>Model Confidence</span>
+      <span class="conf-val">{{ confidence }}%</span>
+    </div>
+    <div class="bar-track">
+      <div class="bar-fill" style="width: {{ confidence }}%;"></div>
+    </div>
+
+    <div class="review-echo">"{{ user_text }}"</div>
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div class="result-card negative">
+    <div style="font-size: 0.9rem; color: #ffd070;">{{ error }}</div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="info-card">
+  <h3>How this classifier works</h3>
+  <div class="info-grid">
+    <div class="info-row">
+      <span class="info-label">Dataset</span>
+      <span class="info-val">48 labeled product/movie reviews</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">TF-IDF Vectorizer</span>
+      <span class="info-val">Converts words to numerical frequencies</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Classifier</span>
+      <span class="info-val">Logistic Regression (binary)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Same Vectorizer Rule</span>
+      <span class="info-val">Re-uses vectorizer.pkl at prediction</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Character counter for textarea
+  const ta       = document.getElementById("user_text");
+  const counter  = document.getElementById("charCount");
+  function updateCount() {
+    counter.textContent = ta.value.length + " / 500";
+    counter.style.color = ta.value.length > 450 ? "#ff6584" : "";
+  }
+  ta.addEventListener("input", updateCount);
+  updateCount(); // initialize on load
+
+  // Click a pill to fill the textarea
+  function fillText(el) {
+    ta.value = el.textContent.trim();
+    ta.focus();
+    updateCount();
+  }
+
+  document.getElementById("sentimentForm").addEventListener("submit", function() {
+    document.getElementById("analyzeBtn").textContent = "Analyzing...";
+    document.getElementById("analyzeBtn").disabled = true;
+  });
+</script>
+{% endblock %}

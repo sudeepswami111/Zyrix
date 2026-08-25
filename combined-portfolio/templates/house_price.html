@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}ML Portfolio — House Price Predictor{% endblock %}
+
+{% block content %}
+<header class="header">
+  <div class="badge">Portfolio ML Project &nbsp;|&nbsp; California Housing</div>
+  <h1>Advanced House<br/>Price Predictor</h1>
+  <p class="header-sub">
+    Powered by <code>{{ model_name }}</code> trained on the real
+    <code>California Housing</code> dataset (20,640 rows, 8 features).
+    Enter block-level statistics to estimate the median house value.
+  </p>
+  <div class="stats-row">
+    <div class="stat-pill">Dataset: <strong>20,640 rows</strong></div>
+    <div class="stat-pill">CV R2: <strong>~0.80</strong></div>
+    <div class="stat-pill">Algorithm: <strong>{{ model_name }}</strong></div>
+    <div class="stat-pill">Features: <strong>8 + 2 derived</strong></div>
+  </div>
+</header>
+
+<div class="card">
+  <p class="card-title">Enter California Block Statistics</p>
+
+  <form method="POST" action="{{ url_for('house_price') }}">
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Median Income <span class="unit">(units of $10,000)</span></label>
+        <input type="number" step="0.01" min="0.5" max="15" name="MedInc"
+               id="MedInc" value="{{ defaults.MedInc }}" required />
+        <span class="hint">e.g. 3.87 = median household income of $38,700</span>
+      </div>
+
+      <div class="field">
+        <label>House Age <span class="unit">(years)</span></label>
+        <input type="number" step="1" min="1" max="52" name="HouseAge"
+               id="HouseAge" value="{{ defaults.HouseAge }}" required />
+        <span class="hint">Median age of houses in the block</span>
+      </div>
+
+      <div class="field">
+        <label>Average Rooms <span class="unit">(per household)</span></label>
+        <input type="number" step="0.01" min="1" max="20" name="AveRooms"
+               id="AveRooms" value="{{ defaults.AveRooms }}" required />
+        <span class="hint">Total rooms including kitchen, bathrooms</span>
+      </div>
+
+      <div class="field">
+        <label>Average Bedrooms <span class="unit">(per household)</span></label>
+        <input type="number" step="0.01" min="0.5" max="10" name="AveBedrms"
+               id="AveBedrms" value="{{ defaults.AveBedrms }}" required />
+        <span class="hint">Typically 1-3 for California blocks</span>
+      </div>
+
+      <div class="field">
+        <label>Population <span class="unit">(total in block)</span></label>
+        <input type="number" step="1" min="3" max="36000" name="Population"
+               id="Population" value="{{ defaults.Population }}" required />
+        <span class="hint">Total persons living in the block group</span>
+      </div>
+
+      <div class="field">
+        <label>Average Occupancy <span class="unit">(persons per household)</span></label>
+        <input type="number" step="0.01" min="1" max="20" name="AveOccup"
+               id="AveOccup" value="{{ defaults.AveOccup }}" required />
+        <span class="hint">Population / number of households</span>
+      </div>
+
+      <div class="field">
+        <label>Latitude <span class="unit">(degrees N)</span></label>
+        <input type="number" step="0.01" min="32.5" max="42.0" name="Latitude"
+               id="Latitude" value="{{ defaults.Latitude }}" required />
+        <span class="hint">California: 32.5 (San Diego) to 42.0 (Oregon border)</span>
+      </div>
+
+      <div class="field">
+        <label>Longitude <span class="unit">(degrees W, negative)</span></label>
+        <input type="number" step="0.01" min="-124.5" max="-114.3" name="Longitude"
+               id="Longitude" value="{{ defaults.Longitude }}" required />
+        <span class="hint">California: -114.3 (east) to -124.5 (coast)</span>
+      </div>
+
+    </div>
+
+    <button type="submit" class="btn" id="predictBtn">
+      Predict House Value
+    </button>
+  </form>
+
+  {% if prediction %}
+  <div class="result-card">
+    <div class="result-tag">Predicted Median House Value</div>
+    <div class="result-price">{{ prediction.dollars }}</div>
+    <div class="result-sub">
+      Model: <span>{{ prediction.model }}</span> &nbsp;|&nbsp;
+      Raw output: <span>{{ "%.4f"|format(prediction.raw) }}</span> ($100k units) &nbsp;|&nbsp;
+      Test MAE: <span>~$34,000</span> typical error
+    </div>
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div class="error-card">{{ error }}</div>
+  {% endif %}
+</div>
+
+<div class="info-card">
+  <h3>How the model works</h3>
+  <div class="info-grid">
+    <div class="info-row">
+      <span class="info-label">Training data</span>
+      <span class="info-val">California Housing (1990 Census)</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Algorithm</span>
+      <span class="info-val">{{ model_name }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Validation method</span>
+      <span class="info-val">5-fold cross-validation</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Hyperparameter search</span>
+      <span class="info-val">RandomizedSearchCV</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Derived features</span>
+      <span class="info-val">bedrooms_per_room, income_per_room</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.querySelector("form").addEventListener("submit", function() {
+    document.getElementById("predictBtn").textContent = "Predicting...";
+    document.getElementById("predictBtn").disabled = true;
+  });
+</script>
+{% endblock %}

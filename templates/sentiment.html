@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentiment Classifier — ML Demo</title>
+  <meta name="description" content="A beginner-friendly ML demo that classifies text sentiment as positive or negative using Logistic Regression and TF-IDF, trained from scratch." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:           #080c18;
+      --bg-card:      rgba(255,255,255,0.04);
+      --border:       rgba(255,255,255,0.08);
+      --accent-pos:   #43e97b;
+      --accent-neg:   #ff6584;
+      --accent-blue:  #6c63ff;
+      --glow-pos:     rgba(67,233,123,0.3);
+      --glow-neg:     rgba(255,101,132,0.3);
+      --glow-blue:    rgba(108,99,255,0.3);
+      --text-1:       #f0f2ff;
+      --text-2:       #8a94b2;
+      --text-3:       #4a5270;
+      --input-bg:     rgba(255,255,255,0.05);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* Animated background blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(130px);
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, #43e97b, transparent);
+      top: -100px; left: -120px;
+      animation: blob1 20s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #ff6584, transparent);
+      bottom: -80px; right: -100px;
+      animation: blob2 25s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes blob1 { from { transform: translate(0,0) scale(1); } to { transform: translate(50px,70px) scale(1.2); } }
+    @keyframes blob2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-40px,60px) scale(1.15); } }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 660px;
+    }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 2.4rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.28);
+      color: #a89dff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 1.2rem;
+    }
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.9rem, 5vw, 2.7rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #f0f2ff 30%, #a89dff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .header p {
+      color: var(--text-2);
+      font-size: 0.93rem;
+      line-height: 1.65;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .header p code {
+      background: rgba(108,99,255,0.15);
+      color: #a89dff;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.84em;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 2.5rem 2.2rem;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 1rem;
+    }
+
+    /* Textarea */
+    .input-wrapper {
+      position: relative;
+      margin-bottom: 1.4rem;
+    }
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid rgba(108,99,255,0.28);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      color: var(--text-1);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+      min-height: 110px;
+      outline: none;
+      line-height: 1.6;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+    textarea::placeholder { color: var(--text-3); }
+    textarea:focus {
+      border-color: rgba(108,99,255,0.6);
+      background: rgba(108,99,255,0.06);
+      box-shadow: 0 0 0 3px rgba(108,99,255,0.14);
+    }
+    .char-count {
+      position: absolute;
+      bottom: 0.6rem;
+      right: 1rem;
+      font-size: 0.7rem;
+      color: var(--text-3);
+      pointer-events: none;
+    }
+
+    /* Example pills */
+    .examples-label {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-bottom: 0.55rem;
+      font-weight: 500;
+    }
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.6rem;
+    }
+    .pill {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.77rem;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      user-select: none;
+    }
+    .pill:hover {
+      background: rgba(108,99,255,0.12);
+      border-color: rgba(108,99,255,0.35);
+      color: var(--text-1);
+    }
+
+    /* Submit button */
+    .btn-analyze {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #6c63ff 0%, #a855f7 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 22px rgba(108,99,255,0.4);
+    }
+    .btn-analyze:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(108,99,255,0.55);
+    }
+    .btn-analyze:active { transform: translateY(0); }
+
+    /* Result card */
+    .result-card {
+      margin-top: 1.8rem;
+      border-radius: 16px;
+      padding: 1.6rem 2rem;
+      border: 1px solid;
+      animation: slideUp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(22px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+    .result-card.positive {
+      background: linear-gradient(135deg, rgba(67,233,123,0.09), rgba(56,249,215,0.04));
+      border-color: rgba(67,233,123,0.3);
+    }
+    .result-card.negative {
+      background: linear-gradient(135deg, rgba(255,101,132,0.09), rgba(255,165,0,0.04));
+      border-color: rgba(255,101,132,0.3);
+    }
+    .result-card.error-card {
+      background: rgba(255,200,0,0.05);
+      border-color: rgba(255,200,0,0.2);
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .result-emoji {
+      font-size: 2.6rem;
+      line-height: 1;
+    }
+    .result-label-small {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 0.25rem;
+    }
+    .result-sentiment {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .result-card.positive .result-sentiment { color: var(--accent-pos); }
+    .result-card.negative .result-sentiment { color: var(--accent-neg); }
+
+    /* Confidence bar */
+    .confidence-section { margin-bottom: 0.8rem; }
+    .confidence-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+    .confidence-label {
+      font-size: 0.78rem;
+      color: var(--text-2);
+    }
+    .confidence-val {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+    .bar-track {
+      height: 7px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+    .positive .bar-fill { background: linear-gradient(90deg, #38f9d7, #43e97b); }
+    .negative .bar-fill { background: linear-gradient(90deg, #f093fb, #ff6584); }
+
+    .review-echo {
+      font-size: 0.82rem;
+      color: var(--text-2);
+      font-style: italic;
+      line-height: 1.55;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Error card */
+    .error-msg {
+      font-size: 0.9rem;
+      color: #ffd070;
+    }
+
+    /* How it works section */
+    .explainer {
+      margin-top: 2rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.4rem 1.8rem;
+    }
+    .explainer h3 {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 1rem;
+    }
+    .steps { display: flex; flex-direction: column; gap: 0.6rem; }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      font-size: 0.82rem;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+    .step .num {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      background: rgba(108,99,255,0.18);
+      border: 1px solid rgba(108,99,255,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.63rem;
+      font-weight: 700;
+      color: #a89dff;
+      margin-top: 1px;
+    }
+    .step strong { color: var(--text-1); }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.8rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="badge">ML Demo &nbsp;|&nbsp; Logistic Regression + TF-IDF</div>
+    <h1>Sentiment Classifier</h1>
+    <p>
+      Type any review sentence below. The model — trained from scratch using
+      <code>scikit-learn</code> on 48 real reviews — will classify it as
+      Positive or Negative and show its confidence.
+    </p>
+  </header>
+
+  <div class="card">
+    <p class="section-label">Enter Your Review</p>
+
+    <form method="POST" action="/" id="sentimentForm">
+
+      <div class="input-wrapper">
+        <textarea
+          id="user_text"
+          name="user_text"
+          placeholder="e.g. This product is absolutely incredible, best I have ever used!"
+          maxlength="500"
+          required
+        >{{ user_text }}</textarea>
+        <span class="char-count" id="charCount">0 / 500</span>
+      </div>
+
+      <p class="examples-label">Quick examples (click to fill):</p>
+      <div class="pills">
+        <span class="pill" onclick="fillText(this)">This movie was an absolute masterpiece</span>
+        <span class="pill" onclick="fillText(this)">Terrible quality, broke after one day</span>
+        <span class="pill" onclick="fillText(this)">The packaging was damaged on arrival</span>
+        <span class="pill" onclick="fillText(this)">Loved every single minute of it</span>
+        <span class="pill" onclick="fillText(this)">Boring and completely overrated</span>
+        <span class="pill" onclick="fillText(this)">Excellent sound and very comfortable</span>
+      </div>
+
+      <button type="submit" class="btn-analyze" id="analyzeBtn">
+        Analyze Sentiment
+      </button>
+
+    </form>
+
+    {#
+      RESULT SECTION (Jinja2 templating):
+        if/endif blocks = conditional rendering (like Python if statements)
+        {{ variable }}  = inject Python variable value into HTML
+      Flask passes: prediction, confidence, user_text, error from sentiment_app.py
+    #}
+    {% if prediction is not none %}
+    <div class="result-card {{ prediction | lower }}">
+      <div class="result-header">
+        <div class="result-emoji">
+          {% if prediction == "Positive" %}:){% else %}:({% endif %}
+        </div>
+        <div>
+          <div class="result-label-small">Predicted Sentiment</div>
+          <div class="result-sentiment">{{ prediction }}</div>
+        </div>
+      </div>
+
+      <div class="confidence-section">
+        <div class="confidence-row">
+          <span class="confidence-label">Model Confidence</span>
+          <span class="confidence-val">{{ confidence }}%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{ confidence }}%;"></div>
+        </div>
+      </div>
+
+      <div class="review-echo">"{{ user_text }}"</div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="result-card error-card">
+      <div class="error-msg">{{ error }}</div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- How it works -->
+  <div class="explainer">
+    <h3>How this classifier works (under the hood)</h3>
+    <div class="steps">
+      <div class="step">
+        <span class="num">1</span>
+        <span><strong>Dataset</strong> — 48 labelled reviews trained the model (<code>train_sentiment.py</code>).</span>
+      </div>
+      <div class="step">
+        <span class="num">2</span>
+        <span><strong>TF-IDF Vectorizer</strong> — converts each sentence into a vector of numbers (one per vocabulary word), because models cannot read raw text.</span>
+      </div>
+      <div class="step">
+        <span class="num">3</span>
+        <span><strong>Logistic Regression</strong> — learned weights for each word: words like "amazing" get high positive weights; "terrible" gets high negative weights.</span>
+      </div>
+      <div class="step">
+        <span class="num">4</span>
+        <span><strong>Same vectorizer at inference</strong> — your typed text is converted using the SAVED vocabulary from training. A new vectorizer would break predictions.</span>
+      </div>
+      <div class="step">
+        <span class="num">5</span>
+        <span><strong>Confidence</strong> — the model's output is a probability (0-100%). Higher = more certain. Below 60% means the sentence is ambiguous to the model.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Character counter for textarea
+  const ta       = document.getElementById("user_text");
+  const counter  = document.getElementById("charCount");
+  function updateCount() {
+    counter.textContent = ta.value.length + " / 500";
+    counter.style.color = ta.value.length > 450 ? "#ff6584" : "";
+  }
+  ta.addEventListener("input", updateCount);
+  updateCount(); // initialise on load (in case text is pre-filled after POST)
+
+  // Click a pill to fill the textarea
+  function fillText(el) {
+    ta.value = el.textContent.trim();
+    ta.focus();
+    updateCount();
+  }
+</script>
+
+</body>
+</html>

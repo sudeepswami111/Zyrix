@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}ML Portfolio — Image Classifier{% endblock %}
+
+{% block content %}
+<header class="header">
+  <div class="badge">CNN Demo &nbsp;|&nbsp; CIFAR-10 Binary Classifier</div>
+  <h1>Image Classifier</h1>
+  <p class="header-sub">
+    Upload any image — the CNN model trained from scratch on
+    <code>CIFAR-10</code> will predict whether it shows an
+    <strong>Airplane</strong> or <strong>Automobile</strong>
+    and give you its confidence score.
+  </p>
+</header>
+
+<div class="card">
+  <p class="card-title">What can this model classify?</p>
+  <div class="classes-row" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+    <div class="class-chip" style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem;">
+      <span class="chip-icon" style="font-size: 1.5rem;">✈</span>
+      <div>
+        <div class="chip-label" style="font-weight: 600;">Airplane</div>
+        <div class="chip-sub" style="font-size: 0.72rem; color: var(--text-3);">Class 0 &mdash; output &lt; 0.5</div>
+      </div>
+    </div>
+    <div class="class-chip" style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem 1rem; display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem;">
+      <span class="chip-icon" style="font-size: 1.5rem;">🚗</span>
+      <div>
+        <div class="chip-label" style="font-weight: 600;">Automobile</div>
+        <div class="chip-sub" style="font-size: 0.72rem; color: var(--text-3);">Class 1 &mdash; output &gt; 0.5</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="card-title">Upload an image</p>
+
+  <form method="POST" action="{{ url_for('image_classifier') }}" enctype="multipart/form-data" id="uploadForm">
+    <div class="dropzone-container" id="dropZone">
+      <input type="file" name="image" id="fileInput" accept="image/*" required style="position: absolute; opacity: 0; cursor: pointer; width: 100%; height: 100%; top:0; left:0; z-index: 10;" />
+      <div class="dropzone-icon" id="dropIcon">📷</div>
+      <div class="dropzone-text" id="dropTitle">Click to upload or drag & drop</div>
+      <div class="dropzone-subtext" id="dropSub">PNG, JPG, JPEG, BMP, WEBP &mdash; any size</div>
+      <img id="preview-img" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 10px; margin: 0.8rem auto 0; display: none; border: 2px solid rgba(108,99,255,0.3);" />
+      <div id="file-name" style="font-size: 0.78rem; color: var(--text-2); margin-top: 0.5rem;"></div>
+    </div>
+
+    <button type="submit" class="btn" id="classifyBtn">
+      Classify Image
+    </button>
+  </form>
+
+  {% if prediction is not none %}
+  <div class="result-card">
+    <div class="result-layout">
+      {% if image_url %}
+      <div class="result-img-panel">
+        <img src="{{ image_url }}" alt="Uploaded image" />
+      </div>
+      {% endif %}
+
+      <div class="result-info">
+        <div class="result-tag">CNN Prediction</div>
+        <div class="result-val">{{ prediction }}</div>
+
+        <div class="conf-row">
+          <span>Model Confidence</span>
+          <span class="conf-val">{{ confidence }}%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{ confidence }}%;"></div>
+        </div>
+
+        <div class="result-note">
+          {% if confidence >= 85 %}
+          High confidence prediction. The model found strong visual features matching the {{ prediction }} class.
+          {% elif confidence >= 65 %}
+          Moderate confidence. The image has some features of {{ prediction }} but also some ambiguity.
+          {% else %}
+          Low confidence (&lt; 65%). The image may be ambiguous, very different from the 32x32 training images, or might not be an airplane or automobile at all.
+          {% endif %}
+          <br /><br />
+          Note: this model was trained on <strong>32x32 pixel</strong> CIFAR-10 images. Your uploaded image was automatically resized to 32x32 before prediction.
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div class="error-card">{{ error }}</div>
+  {% endif %}
+</div>
+
+<div class="info-card">
+  <h3>CNN Architecture used for this classifier</h3>
+  <div class="arch-flow" style="display: flex; align-items: center; gap: 0; flex-wrap: wrap; row-gap: 0.5rem; margin-bottom: 1rem;">
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">Input<br/>32x32x3</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">Conv2D<br/>32 filters</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">MaxPool<br/>16x16</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">Conv2D<br/>64 filters</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">MaxPool<br/>8x8</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">Flatten<br/>4096 vals</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">Dense<br/>64 neurons</span>
+    <span class="arch-arrow" style="color: var(--text-3); font-size: 0.75rem; padding: 0 0.3rem;">&#8594;</span>
+    <span class="arch-block" style="background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.75rem; color: #c4bfff; white-space: nowrap;">Output<br/>Sigmoid</span>
+  </div>
+  <p style="font-size: 0.78rem; color: var(--text-2); line-height: 1.6;">
+    <strong>Conv2D</strong> slides small 3x3 filters across the image, learning to detect edges and shapes. <strong>MaxPooling</strong> halves the spatial size, reducing params and preventing overfitting. The final <strong>Sigmoid</strong> activation maps the outputs to a probability range [0, 1].
+  </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const fileInput = document.getElementById("fileInput");
+  const preview   = document.getElementById("preview-img");
+  const dropZone  = document.getElementById("dropZone");
+  const dropIcon  = document.getElementById("dropIcon");
+  const dropTitle = document.getElementById("dropTitle");
+  const dropSub   = document.getElementById("dropSub");
+  const fileNameEl= document.getElementById("file-name");
+  const btn       = document.getElementById("classifyBtn");
+
+  // Show image preview when a file is selected
+  fileInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = "block";
+      dropIcon.style.display = "none";
+      dropTitle.textContent  = "Image selected";
+      fileNameEl.textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Drag-and-drop highlight
+  ["dragenter", "dragover"].forEach(evt =>
+    dropZone.addEventListener(evt, () => dropZone.classList.add("drag-over"))
+  );
+  ["dragleave", "drop"].forEach(evt =>
+    dropZone.addEventListener(evt, () => dropZone.classList.remove("drag-over"))
+  );
+
+  // Show loading state on submit
+  document.getElementById("uploadForm").addEventListener("submit", function() {
+    btn.disabled = true;
+    btn.textContent = "Classifying...";
+  });
+</script>
+{% endblock %}
