@@ -16,8 +16,14 @@ interface VideoPlayerProps {
   episodeNumber?: string;
 }
 
+// Video URL: set NEXT_PUBLIC_VIDEO_BASE_URL in your .env.local or hosting env vars
+// e.g. NEXT_PUBLIC_VIDEO_BASE_URL=https://pub-xxxxxxxx.r2.dev
+const VIDEO_BASE_URL = process.env.NEXT_PUBLIC_VIDEO_BASE_URL ?? "";
+
 export function VideoPlayer({
-  src = "/videos/module-1/episode-1-what-is-python.mp4",
+  src = VIDEO_BASE_URL
+    ? `${VIDEO_BASE_URL}/module-1/episode-1-what-is-python.mp4`
+    : "/videos/module-1/episode-1-what-is-python.mp4",
   poster = "/videos/module-1/poster.svg",
   title = "What Is Python?",
   moduleName = "Module 1: Basic Python Programming",
@@ -53,7 +59,7 @@ export function VideoPlayer({
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#C1502E] animate-pulse" />
           <span className="font-semibold text-[#2B2521]">{title}</span>
-          <span className="text-[#A89F91]">•</span>
+          <span className="text-[#A89F91]">·</span>
           <span className="font-mono text-[#6B6058]">{episodeNumber}</span>
         </div>
 
@@ -94,7 +100,7 @@ export function VideoPlayer({
           onPause={() => setIsPlaying(false)}
           onEnded={() => setIsPlaying(false)}
         >
-          {/* Captions Track Placeholder for WCAG accessibility */}
+          {/* Captions Track */}
           <track
             kind="captions"
             src="/captions/episode-1.vtt"
@@ -147,4 +153,3 @@ export function VideoPlayer({
     </div>
   );
 }
-
