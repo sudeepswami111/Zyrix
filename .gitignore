@@ -40,10 +40,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Large media files - serve via CDN or external storage
-/public/videos/
-*.mp4
-*.mov
-*.avi
-*.webm
 
