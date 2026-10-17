@@ -337,14 +337,13 @@ export default function Episode1Page() {
           </Link>
 
           {/* Next Episode Link */}
-          <div
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/70 text-sm font-medium text-[#A89F91] cursor-not-allowed select-none"
-            aria-disabled="true"
-            title="Episode 2 will be available in the next release"
+          <Link
+            href="/learn/module-1/episode-2"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[#E6DCC8] bg-white hover:bg-[#FAF4ED] text-sm font-medium text-[#2B2521] hover:text-[#C1502E] transition-all shadow-xs group"
           >
-            <span>Next: Episode 2 (Variables &amp; Mutability)</span>
-            <ArrowRight className="w-4 h-4 text-[#C5B8A5]" />
-          </div>
+            <span>Next: Episode 2 (Assign a Value to a Variable)</span>
+            <ArrowRight className="w-4 h-4 text-[#6B6058] group-hover:text-[#C1502E] transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </nav>
       </main>
 
@@ -353,3 +352,4 @@ export default function Episode1Page() {
     </div>
   );
 }
+

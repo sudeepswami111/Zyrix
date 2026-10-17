@@ -13,7 +13,7 @@ import {
   Check,
 } from "lucide-react";
 
-interface QuizOption {
+export interface QuizOption {
   id: string;
   letter: string;
   text: string;
@@ -21,14 +21,14 @@ interface QuizOption {
   explanation: string;
 }
 
-interface QuizQuestion {
+export interface QuizQuestion {
   id: number;
   question: string;
   options: QuizOption[];
   conceptCategory: string;
 }
 
-const QUIZ_QUESTIONS: QuizQuestion[] = [
+const DEFAULT_QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 1,
     conceptCategory: "Syntax & Functions",
@@ -381,7 +381,13 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
 ];
 
-export function QuizPreview() {
+interface QuizPreviewProps {
+  questions?: QuizQuestion[];
+  quizTitle?: string;
+}
+
+export function QuizPreview({ questions: customQuestions, quizTitle }: QuizPreviewProps = {}) {
+  const QUIZ_QUESTIONS = customQuestions || DEFAULT_QUIZ_QUESTIONS;
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
@@ -723,3 +729,4 @@ export function QuizPreview() {
     </div>
   );
 }
+

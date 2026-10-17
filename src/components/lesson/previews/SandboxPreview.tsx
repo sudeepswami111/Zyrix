@@ -16,8 +16,12 @@ import { usePyodideRunner } from "@/hooks/usePyodideRunner";
 
 const STARTER_CODE = `print("Exam scores analyzed!")`;
 
-export function SandboxPreview() {
-  const [code, setCode] = useState(STARTER_CODE);
+interface SandboxPreviewProps {
+  initialCode?: string;
+}
+
+export function SandboxPreview({ initialCode = STARTER_CODE }: SandboxPreviewProps = {}) {
+  const [code, setCode] = useState(initialCode);
   const {
     isLoading,
     isReady,
@@ -53,7 +57,7 @@ export function SandboxPreview() {
   };
 
   const handleReset = () => {
-    setCode(STARTER_CODE);
+    setCode(initialCode);
     resetOutput();
   };
 
@@ -243,3 +247,4 @@ export function SandboxPreview() {
     </div>
   );
 }
+

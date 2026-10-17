@@ -10,7 +10,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-interface StoryChapter {
+export interface StoryChapter {
   id: string;
   number: string;
   title: string;
@@ -22,10 +22,14 @@ interface StoryChapter {
   closingTeaser?: string;
 }
 
-export function StoryPreview() {
+interface StoryPreviewProps {
+  chapters?: StoryChapter[];
+}
+
+export function StoryPreview({ chapters: customChapters }: StoryPreviewProps = {}) {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
 
-  const chapters: StoryChapter[] = [
+  const defaultChapters: StoryChapter[] = [
     {
       id: "chapter-1",
       number: "01",
@@ -140,7 +144,8 @@ export function StoryPreview() {
     },
   ];
 
-  const currentChapter = chapters[activeChapterIndex];
+  const chapters = customChapters || defaultChapters;
+  const currentChapter = chapters[activeChapterIndex] || chapters[0];
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -357,3 +362,6 @@ export function StoryPreview() {
     </div>
   );
 }
+
+
+
