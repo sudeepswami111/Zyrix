@@ -19,7 +19,7 @@ import { Footer } from "@/components/Footer";
 import { LessonTabs, LessonTabId } from "@/components/lesson/LessonTabs";
 import { NarratedVideoStage } from "@/components/lesson/NarratedVideoStage";
 import { episode1Scenes } from "@/components/lesson/episode1Scenes";
-import { Episode1Story } from "@/components/lesson/Episode1Story";
+import { VideoPlayer } from "@/components/lesson/VideoPlayer";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
 
 export default function Episode1Page() {
@@ -83,17 +83,11 @@ export default function Episode1Page() {
             onTabChange={setActiveTab}
             hiddenTabs={["quiz"]}
             tabOverrides={{
-              watch: {
-                badge: "6 Scenes",
-                isAvailable: true,
-                description:
-                  "Narrated story stage: Step through 6 full-bleed explainer scenes with speech synthesis and auto-pacing",
-              },
               story: {
-                badge: undefined,
+                badge: "2 Scenes",
                 isAvailable: true,
                 description:
-                  "Follow Asha's personal story: thirty spreadsheets, one blinking cursor, and the first time code answered back",
+                  "Narrated story slideshow: Follow Asha typing her very first line of Python",
               },
               sandbox: {
                 badge: undefined,
@@ -112,19 +106,25 @@ export default function Episode1Page() {
           aria-labelledby={`lesson-tab-${activeTab}`}
           className="w-full"
         >
-          {/* Format 1: Watch (Story Mode Explainer Stage) */}
+          {/* Format 1: Watch (Real HTML5 Video) */}
           {activeTab === "watch" && (
-            <NarratedVideoStage
+            <VideoPlayer
+              src="/videos/module-1/episode-1-what-is-python.mp4"
+              poster="/videos/module-1/poster.svg"
               title="What Is Python?"
-              kicker="Module 1 · Episode 1 preview"
-              subtitle="A narrated-style walkthrough of the first lesson in Module 1. Press play, or step through it yourself."
-              scenes={episode1Scenes}
+              moduleName="Module 1: Basic Python Programming"
+              episodeNumber="Episode 01"
             />
           )}
 
-          {/* Format 2: Story (Asha's Narrative Thread) */}
+          {/* Format 2: Story (Asha's Story Slideshow) */}
           {activeTab === "story" && (
-            <Episode1Story />
+            <NarratedVideoStage
+              title="What Is Python?"
+              kicker="Module 1 · Episode 1 story"
+              subtitle="Follow Asha as she opens a terminal and runs her first line of code."
+              scenes={episode1Scenes}
+            />
           )}
 
           {/* Format 3: Sandbox (Real In-Browser Pyodide Playground) */}
