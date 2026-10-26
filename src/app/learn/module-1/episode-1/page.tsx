@@ -12,7 +12,6 @@ import {
   BookOpen,
   Clock,
   Terminal,
-  Award,
 } from "lucide-react";
 import { PageBackground } from "@/components/PageBackground";
 import { Navbar } from "@/components/Navbar";
@@ -21,7 +20,6 @@ import { LessonTabs, LessonTabId } from "@/components/lesson/LessonTabs";
 import { VideoPlayer } from "@/components/lesson/VideoPlayer";
 import { StoryPreview } from "@/components/lesson/previews/StoryPreview";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
-import { QuizPreview } from "@/components/lesson/previews/QuizPreview";
 
 export default function Episode1Page() {
   const [activeTab, setActiveTab] = useState<LessonTabId>("watch");
@@ -82,24 +80,19 @@ export default function Episode1Page() {
           <LessonTabs
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            hiddenTabs={["quiz"]}
             tabOverrides={{
               story: {
                 badge: undefined,
                 isAvailable: true,
                 description:
-                  "Follow Asha's journey in 'Asha's First Line' — a 3-chapter worked example from spreadsheet to code",
+                  "Follow Asha's journey in 'Asha's First Line' - a 3-chapter worked example from spreadsheet to code",
               },
               sandbox: {
                 badge: undefined,
                 isAvailable: true,
                 description:
-                  "Real in-browser Python 3.12 sandbox — run Asha's first line of code and experiment live",
-              },
-              quiz: {
-                badge: undefined,
-                isAvailable: true,
-                description:
-                  "10-question scored knowledge check on Python's core mental model and developer loop",
+                  "Real in-browser Python 3.12 sandbox - run Asha's first line of code and experiment live",
               },
             }}
           />
@@ -230,60 +223,6 @@ export default function Episode1Page() {
               </div>
             </div>
           )}
-
-          {/* Format 4: Quiz (Real 10-Question Scored Quiz) */}
-          {activeTab === "quiz" && (
-            <div className="w-full bg-white rounded-2xl border border-[#E6DCC8] shadow-warm-md overflow-hidden flex flex-col transition-all duration-200">
-              {/* Top Meta Bar */}
-              <div className="px-4 sm:px-6 py-3.5 bg-[#FAF4ED]/80 border-b border-[#E6DCC8] flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#C1502E] animate-pulse" />
-                  <span className="font-semibold text-[#2B2521]">Episode 1 Mastery Quiz</span>
-                  <span className="text-[#A89F91]">•</span>
-                  <span className="font-mono text-[#6B6058]">10 Questions</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1E2CF] text-[#8C3A20] font-mono text-[11px] font-semibold border border-[#E6DCC8] shadow-xs">
-                    <Award className="w-3 h-3 text-[#C1502E]" />
-                    <span>100 Points Total</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Main Content Area */}
-              <div className="p-6 sm:p-8 flex flex-col gap-6">
-                <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
-                    <span>KNOWLEDGE RETRIEVAL</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
-                    Test Your Episode 1 Intuition
-                  </h3>
-                  <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
-                    Reinforce Python syntax, the print() function, and Asha&apos;s first loop with fast retrieval practice and immediate feedback.
-                  </p>
-                </div>
-
-                {/* Embedded Real 10-Question Scored Quiz */}
-                <div className="w-full rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/60 p-4 sm:p-6 overflow-hidden">
-                  <QuizPreview />
-                </div>
-              </div>
-
-              {/* Footer Info */}
-              <div className="p-4 sm:p-5 bg-[#FAF4ED]/50 border-t border-[#E6DCC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#6B6058]">
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-[#C1502E] shrink-0" />
-                  <span>10 points per question • 100 points maximum • Instant explanations on every attempt</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-[11px] font-mono text-[#8C7E72]">
-                  <span>Module 1: Episode 1 Multi-Format Track</span>
-                </div>
-              </div>
-            </div>
-          )}
         </section>
 
         {/* Lesson Key Takeaways Note Box */}
@@ -352,4 +291,5 @@ export default function Episode1Page() {
     </div>
   );
 }
+
 

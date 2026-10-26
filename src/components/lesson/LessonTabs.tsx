@@ -53,13 +53,16 @@ interface LessonTabsProps {
   activeTab: LessonTabId;
   onTabChange: (tabId: LessonTabId) => void;
   tabOverrides?: Partial<Record<LessonTabId, Partial<TabConfig>>>;
+  hiddenTabs?: LessonTabId[];
 }
 
-export function LessonTabs({ activeTab, onTabChange, tabOverrides }: LessonTabsProps) {
-  const tabs = LESSON_TABS.map((tab) => ({
-    ...tab,
-    ...(tabOverrides?.[tab.id] || {}),
-  }));
+export function LessonTabs({ activeTab, onTabChange, tabOverrides, hiddenTabs }: LessonTabsProps) {
+  const tabs = LESSON_TABS
+    .filter((tab) => !hiddenTabs?.includes(tab.id))
+    .map((tab) => ({
+      ...tab,
+      ...(tabOverrides?.[tab.id] || {}),
+    }));
 
   return (
     <div className="w-full space-y-4">
@@ -138,3 +141,4 @@ export function LessonTabs({ activeTab, onTabChange, tabOverrides }: LessonTabsP
     </div>
   );
 }
+
