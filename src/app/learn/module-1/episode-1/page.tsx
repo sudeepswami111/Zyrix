@@ -17,7 +17,8 @@ import { PageBackground } from "@/components/PageBackground";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LessonTabs, LessonTabId } from "@/components/lesson/LessonTabs";
-import { VideoPlayer } from "@/components/lesson/VideoPlayer";
+import { NarratedVideoStage } from "@/components/lesson/NarratedVideoStage";
+import { episode1Scenes } from "@/components/lesson/episode1Scenes";
 import { StoryPreview } from "@/components/lesson/previews/StoryPreview";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
 
@@ -82,6 +83,12 @@ export default function Episode1Page() {
             onTabChange={setActiveTab}
             hiddenTabs={["quiz"]}
             tabOverrides={{
+              watch: {
+                badge: "6 Scenes",
+                isAvailable: true,
+                description:
+                  "Narrated story stage: Step through 6 full-bleed explainer scenes with speech synthesis and auto-pacing",
+              },
               story: {
                 badge: undefined,
                 isAvailable: true,
@@ -105,14 +112,13 @@ export default function Episode1Page() {
           aria-labelledby={`lesson-tab-${activeTab}`}
           className="w-full"
         >
-          {/* Format 1: Watch (Real HTML5 Video) */}
+          {/* Format 1: Watch (Story Mode Explainer Stage) */}
           {activeTab === "watch" && (
-            <VideoPlayer
-              src="/videos/module-1/episode-1-what-is-python.mp4"
-              poster="/videos/module-1/poster.svg"
+            <NarratedVideoStage
               title="What Is Python?"
-              moduleName="Module 1: Basic Python Programming"
-              episodeNumber="Episode 01"
+              kicker="Module 1 · Episode 1 preview"
+              subtitle="A narrated-style walkthrough of the first lesson in Module 1. Press play, or step through it yourself."
+              scenes={episode1Scenes}
             />
           )}
 
