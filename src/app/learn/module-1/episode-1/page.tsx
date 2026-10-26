@@ -19,7 +19,7 @@ import { Footer } from "@/components/Footer";
 import { LessonTabs, LessonTabId } from "@/components/lesson/LessonTabs";
 import { NarratedVideoStage } from "@/components/lesson/NarratedVideoStage";
 import { episode1Scenes } from "@/components/lesson/episode1Scenes";
-import { StoryPreview } from "@/components/lesson/previews/StoryPreview";
+import { Episode1Story } from "@/components/lesson/Episode1Story";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
 
 export default function Episode1Page() {
@@ -93,7 +93,7 @@ export default function Episode1Page() {
                 badge: undefined,
                 isAvailable: true,
                 description:
-                  "Follow Asha's journey in 'Asha's First Line' - a 3-chapter worked example from spreadsheet to code",
+                  "Follow Asha's personal story: thirty spreadsheets, one blinking cursor, and the first time code answered back",
               },
               sandbox: {
                 badge: undefined,
@@ -122,58 +122,9 @@ export default function Episode1Page() {
             />
           )}
 
-          {/* Format 2: Story (Interactive 3-Chapter Reader) */}
+          {/* Format 2: Story (Asha's Narrative Thread) */}
           {activeTab === "story" && (
-            <div className="w-full bg-white rounded-2xl border border-[#E6DCC8] shadow-warm-md overflow-hidden flex flex-col transition-all duration-200">
-              {/* Top Meta Bar */}
-              <div className="px-4 sm:px-6 py-3.5 bg-[#FAF4ED]/80 border-b border-[#E6DCC8] flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#C1502E]" />
-                  <span className="font-semibold text-[#2B2521]">Asha&apos;s First Line</span>
-                  <span className="text-[#A89F91]">•</span>
-                  <span className="font-mono text-[#6B6058]">Worked-Example Story</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1E2CF] text-[#8C3A20] font-mono text-[11px] font-semibold border border-[#E6DCC8] shadow-xs">
-                    <BookOpen className="w-3 h-3 text-[#C1502E]" />
-                    <span>3 Chapters</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Main Content Area */}
-              <div className="p-6 sm:p-8 flex flex-col gap-6">
-                <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
-                    <span>WORKED-EXAMPLE STORY</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
-                    Asha&apos;s First Line
-                  </h3>
-                  <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
-                    Follow Asha as she learns Python from scratch — a worked example you&apos;ll follow across every lesson in this module.
-                  </p>
-                </div>
-
-                {/* Embedded 3-Chapter Interactive Story Reader */}
-                <div className="w-full rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/60 p-4 sm:p-6 overflow-hidden">
-                  <StoryPreview />
-                </div>
-              </div>
-
-              {/* Footer Info */}
-              <div className="p-4 sm:p-5 bg-[#FAF4ED]/50 border-t border-[#E6DCC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#6B6058]">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#C1502E] shrink-0" />
-                  <span>3-minute read • Interactive chapter reader</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-[11px] font-mono text-[#8C7E72]">
-                  <span>Module 1: Episode 1 Multi-Format Track</span>
-                </div>
-              </div>
-            </div>
+            <Episode1Story />
           )}
 
           {/* Format 3: Sandbox (Real In-Browser Pyodide Playground) */}
