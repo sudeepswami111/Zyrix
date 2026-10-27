@@ -84,7 +84,7 @@ export default function Episode1Page() {
             hiddenTabs={["quiz"]}
             tabOverrides={{
               story: {
-                badge: "2 Scenes",
+                badge: "10 Scenes",
                 isAvailable: true,
                 description:
                   "Narrated story slideshow: Follow Asha typing her very first line of Python",
@@ -248,5 +248,6 @@ export default function Episode1Page() {
     </div>
   );
 }
+
 
 

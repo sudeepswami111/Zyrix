@@ -15,12 +15,11 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LessonTabs, LessonTabId } from "@/components/lesson/LessonTabs";
 import { NarratedVideoStage } from "@/components/lesson/NarratedVideoStage";
-import { episode2Scenes } from "@/components/lesson/episode2Scenes";
-import { StoryPreview } from "@/components/lesson/previews/StoryPreview";
+import { VideoPlayer } from "@/components/lesson/VideoPlayer";
+import { episode2StoryScenes } from "@/components/lesson/episode2StoryScenes";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
 import {
   EPISODE_2_STARTER_CODE,
-  EPISODE_2_STORY_CHAPTERS,
 } from "@/components/lesson/episode2Content";
 
 export default function Episode2Page() {
@@ -73,11 +72,11 @@ export default function Episode2Page() {
           </h1>
 
           <p className="text-base sm:text-lg text-[#6B6058] font-sans leading-relaxed max-w-3xl">
-            A narrated-style walkthrough of the second lesson in Module 1. Press play, or step through it yourself.
+            Learn how to store values in named boxes, update them in one place, and let Python remember everything for you.
           </p>
         </div>
 
-        {/* Four Format Tabs */}
+        {/* Three Format Tabs */}
         <section aria-label="Lesson learning formats" className="w-full">
           <LessonTabs
             activeTab={activeTab}
@@ -85,22 +84,21 @@ export default function Episode2Page() {
             hiddenTabs={["quiz"]}
             tabOverrides={{
               watch: {
-                badge: "7 Scenes",
+                badge: "Video",
                 isAvailable: true,
-                description:
-                  "Narrated video stage: Step through 7 full-bleed explainer scenes with speech synthesis and auto-pacing",
+                description: "Watch the full lesson video for Episode 2",
               },
               story: {
-                badge: undefined,
+                badge: "10 Scenes",
                 isAvailable: true,
                 description:
-                  "Follow Asha's journey in 'A Name for Everything' - 3 chapters on naming variables and overwriting memory",
+                  "Follow Asha as she discovers variables — 10 animated story scenes with motion graphics",
               },
               sandbox: {
                 badge: undefined,
                 isAvailable: true,
                 description:
-                  "Real in-browser Python 3.12 sandbox - declare variables, reassign scores, and inspect memory live",
+                  "Real in-browser Python 3.12 sandbox — declare variables, reassign scores, and inspect memory live",
               },
             }}
           />
@@ -113,45 +111,28 @@ export default function Episode2Page() {
           aria-labelledby={`lesson-tab-${activeTab}`}
           className="w-full"
         >
-          {/* Format 1: Watch (Narrated Video Stage Card with 16:10 aspect ratio) */}
+          {/* Watch Tab — Video Player (video to be added) */}
           {activeTab === "watch" && (
-            <NarratedVideoStage
+            <VideoPlayer
+              src="/videos/module-1/episode-2-assign-variable.mp4"
+              poster="/videos/module-1/poster-ep2.svg"
               title="Assign a Value to a Variable"
-              kicker="Module 1 · Episode 2 preview"
-              subtitle="A narrated-style walkthrough of the second lesson in Module 1. Press play, or step through it yourself."
-              scenes={episode2Scenes}
-              onCtaClick={() => {
-                // When CTA is clicked, switch to Sandbox tab for the interactive lesson
-                setActiveTab("sandbox");
-              }}
+              moduleName="Module 1: Basic Python Programming"
+              episodeNumber="Episode 02"
             />
           )}
 
-          {/* Format 2: Story (Worked-Example Story) */}
+          {/* Story Tab — Animated NarratedVideoStage */}
           {activeTab === "story" && (
-            <div className="w-full bg-white rounded-2xl border border-[#E6DCC8] shadow-warm-md overflow-hidden flex flex-col transition-all duration-200">
-              {/* Top Meta Bar */}
-              <div className="px-4 sm:px-6 py-3.5 bg-[#FAF4ED]/80 border-b border-[#E6DCC8] flex flex-wrap items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#C1502E] animate-pulse" />
-                  <span className="font-semibold text-[#2B2521]">Asha&apos;s Worked Example: The Labeled Box</span>
-                  <span className="text-[#A89F91]">·</span>
-                  <span className="font-mono text-[#6B6058]">3 Chapter Scenes</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-[11px] font-mono text-[#8C3A20] bg-[#F1E2CF] px-2.5 py-0.5 rounded-full border border-[#E6DCC8]">
-                  <span>~3 min read</span>
-                </div>
-              </div>
-
-              {/* Story Content */}
-              <div className="p-6 sm:p-8">
-                <StoryPreview chapters={EPISODE_2_STORY_CHAPTERS} />
-              </div>
-            </div>
+            <NarratedVideoStage
+              title="Assign a Value to a Variable"
+              kicker="Module 1 · Episode 2 story"
+              subtitle="Follow Asha as she discovers why naming values changes everything."
+              scenes={episode2StoryScenes}
+            />
           )}
 
-          {/* Format 3: Sandbox (Real In-Browser Pyodide Playground) */}
+          {/* Sandbox Tab — Real In-Browser Pyodide Playground */}
           {activeTab === "sandbox" && (
             <div className="w-full bg-white rounded-2xl border border-[#E6DCC8] shadow-warm-md overflow-hidden flex flex-col transition-all duration-200">
               {/* Top Meta Bar */}
