@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
@@ -87,7 +87,6 @@ export function NarratedVideoStage({
 }: NarratedVideoStageProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [elapsed, setElapsed] = useState(0); // ms in current scene
   const [isNarrating, setIsNarrating] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">(defaultTheme);
   const [speechSupported, setSpeechSupported] = useState(false);
@@ -97,6 +96,16 @@ export function NarratedVideoStage({
   const animFrameRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number | null>(null);
   const isSpeechActiveRef = useRef(false);
+
+  // Refs for rAF-driven progress: avoids 60fps React re-renders
+  const elapsedRef = useRef(0);
+  const currentIndexRef = useRef(0);
+  const isPlayingRef = useRef(false);
+  const progressBarRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Keep currentIndexRef in sync with state
+  React.useLayoutEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   const currentScene = scenes[currentIndex] || scenes[0];
 
@@ -182,10 +191,18 @@ export function NarratedVideoStage({
     (newIndex: number, shouldPlay?: boolean) => {
       stopSpeech();
       const boundedIndex = Math.max(0, Math.min(scenes.length - 1, newIndex));
-      setCurrentIndex(boundedIndex);
-      setElapsed(0);
+      // Reset elapsed ref immediately so rAF loop picks up the new scene duration
+      elapsedRef.current = 0;
       lastTimeRef.current = null;
+      // Reset the target bar to 0% and mark all past bars as 100% immediately
+      progressBarRefs.current.forEach((bar, idx) => {
+        if (!bar) return;
+        if (idx < boundedIndex) bar.style.width = "100%";
+        else bar.style.width = "0%";
+      });
+      setCurrentIndex(boundedIndex);
       if (typeof shouldPlay === "boolean") {
+        isPlayingRef.current = shouldPlay;
         setIsPlaying(shouldPlay);
       }
     },
@@ -197,7 +214,10 @@ export function NarratedVideoStage({
     if (currentIndex > 0) {
       goToScene(currentIndex - 1, isPlaying);
     } else {
-      setElapsed(0);
+      elapsedRef.current = 0;
+      lastTimeRef.current = null;
+      const bar = progressBarRefs.current[0];
+      if (bar) bar.style.width = "0%";
     }
   }, [currentIndex, isPlaying, goToScene]);
 
@@ -210,7 +230,11 @@ export function NarratedVideoStage({
   }, [currentIndex, scenes.length, isPlaying, goToScene]);
 
   const handleTogglePlay = useCallback(() => {
-    setIsPlaying((prev) => !prev);
+    setIsPlaying((prev) => {
+      const next = !prev;
+      isPlayingRef.current = next;
+      return next;
+    });
     lastTimeRef.current = null;
   }, []);
 
@@ -229,11 +253,12 @@ export function NarratedVideoStage({
   // CTA Click handler: pauses playback and resets to scene 1 without re-triggering narration
   const handleCtaClick = useCallback(() => {
     stopSpeech();
+    isPlayingRef.current = false;
+    elapsedRef.current = 0;
+    lastTimeRef.current = null;
     setIsPlaying(false);
     setIsNarrating(false); // disable narration on reset
     setCurrentIndex(0);
-    setElapsed(0);
-    lastTimeRef.current = null;
 
     if (currentScene.cta?.onClick) {
       currentScene.cta.onClick();
@@ -243,42 +268,56 @@ export function NarratedVideoStage({
     }
   }, [currentScene, onCtaClick, stopSpeech]);
 
-  // Animation frame loop for playback timing
+  // RAF-driven playback loop — updates progress bars via DOM refs (no React re-renders at 60fps)
   useEffect(() => {
     if (!isPlaying) {
       lastTimeRef.current = null;
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
       }
       return;
     }
 
-    const duration = currentScene.duration || 5000;
+    isPlayingRef.current = true;
 
     const tick = (now: number) => {
+      // Stopped externally
+      if (!isPlayingRef.current) return;
+
       if (lastTimeRef.current === null) {
         lastTimeRef.current = now;
       }
       const delta = now - lastTimeRef.current;
       lastTimeRef.current = now;
 
-      setElapsed((prev) => {
-        const next = prev + delta;
-        if (next >= duration) {
-          // Advance to next scene or complete
-          if (currentIndex < scenes.length - 1) {
-            setCurrentIndex((idx) => idx + 1);
-            lastTimeRef.current = null;
-            return 0;
-          } else {
-            // Reached end of last scene
-            setIsPlaying(false);
-            if (onComplete) onComplete();
-            return duration;
-          }
+      const idx = currentIndexRef.current;
+      const duration = scenes[idx]?.duration ?? 5000;
+      elapsedRef.current = Math.min(elapsedRef.current + delta, duration);
+
+      // Update the active progress bar fill directly in the DOM — zero React overhead
+      const fillPct = Math.min(100, (elapsedRef.current / duration) * 100);
+      const bar = progressBarRefs.current[idx];
+      if (bar) bar.style.width = `${fillPct}%`;
+
+      if (elapsedRef.current >= duration) {
+        // Advance to next scene
+        if (idx < scenes.length - 1) {
+          const nextIdx = idx + 1;
+          elapsedRef.current = 0;
+          lastTimeRef.current = null;
+          // Mark past bar as full immediately
+          if (bar) bar.style.width = "100%";
+          // Trigger React state update for scene change (this is intentionally rare — once per scene)
+          setCurrentIndex(nextIdx);
+        } else {
+          // End of all scenes
+          isPlayingRef.current = false;
+          setIsPlaying(false);
+          if (onComplete) onComplete();
+          return;
         }
-        return next;
-      });
+      }
 
       animFrameRef.current = requestAnimationFrame(tick);
     };
@@ -288,9 +327,12 @@ export function NarratedVideoStage({
     return () => {
       if (animFrameRef.current) {
         cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = null;
       }
     };
-  }, [isPlaying, currentIndex, currentScene.duration, scenes.length, onComplete]);
+    // Only restart the loop when isPlaying toggles — scene changes are handled inside the tick
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback(
@@ -312,11 +354,8 @@ export function NarratedVideoStage({
     [handleTogglePlay, handlePrev, handleNext, handleToggleNarration]
   );
 
-  // Current progress calculation
-  const currentProgressPercent = useMemo(() => {
-    const dur = currentScene.duration || 5000;
-    return Math.min(100, Math.max(0, (elapsed / dur) * 100));
-  }, [elapsed, currentScene.duration]);
+  // Current progress calculation — only used for initial/static render of past segments
+  // The active bar is updated imperatively via progressBarRefs in the rAF tick
 
   return (
     <div
@@ -498,27 +537,24 @@ export function NarratedVideoStage({
         >
           {scenes.map((scene, idx) => {
             const isPast = idx < currentIndex;
-            const isCurrent = idx === currentIndex;
-            const isFuture = idx > currentIndex;
-
-            let fillWidth = "0%";
-            if (isPast) fillWidth = "100%";
-            else if (isCurrent) fillWidth = `${currentProgressPercent}%`;
+            // Active bar starts at 0% on mount — the rAF tick drives it imperatively via ref
+            const initialWidth = isPast ? "100%" : "0%";
 
             return (
               <button
                 key={scene.id || idx}
                 type="button"
                 role="tab"
-                aria-selected={isCurrent}
+                aria-selected={idx === currentIndex}
                 aria-label={`Jump to scene ${idx + 1}: ${scene.headline}`}
                 onClick={() => goToScene(idx, isPlaying)}
                 title={`Scene ${idx + 1}: ${scene.headline}`}
                 className="group/seg relative h-2 sm:h-2.5 rounded-full bg-[var(--stage-bar-bg)] overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--stage-accent)] transition-all hover:h-3"
               >
                 <div
-                  className="h-full bg-[var(--stage-accent)] rounded-full transition-[width] duration-75 ease-linear group-hover/seg:bg-[var(--stage-accent-hover)]"
-                  style={{ width: fillWidth }}
+                  ref={(el) => { progressBarRefs.current[idx] = el; }}
+                  className="h-full bg-[var(--stage-accent)] rounded-full group-hover/seg:bg-[var(--stage-accent-hover)]"
+                  style={{ width: initialWidth }}
                 />
               </button>
             );
@@ -576,7 +612,7 @@ export function NarratedVideoStage({
           </button>
 
           {/* Reset / Restart Button */}
-          {(currentIndex > 0 || elapsed > 0) && (
+          {(currentIndex > 0 || elapsedRef.current > 0) && (
             <button
               type="button"
               onClick={() => goToScene(0, false)}
