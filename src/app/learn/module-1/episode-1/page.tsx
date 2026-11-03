@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -21,9 +21,14 @@ import { NarratedVideoStage } from "@/components/lesson/NarratedVideoStage";
 import { episode1Scenes } from "@/components/lesson/episode1Scenes";
 import { VideoPlayer } from "@/components/lesson/VideoPlayer";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
+import { SandboxTest } from "@/components/lesson/SandboxTest";
+import { episode1TestQuestions } from "@/components/lesson/episode1TestQuestions";
+
+type SandboxMode = "practice" | "test";
 
 export default function Episode1Page() {
   const [activeTab, setActiveTab] = useState<LessonTabId>("watch");
+  const [sandboxMode, setSandboxMode] = useState<SandboxMode>("practice");
 
   return (
     <div className="relative min-h-screen flex flex-col bg-[#FBF6EF] text-[#2B2521] selection:bg-[#F1E2CF] selection:text-[#C1502E]">
@@ -147,24 +152,87 @@ export default function Episode1Page() {
                 </div>
               </div>
 
-              {/* Main Content Area */}
-              <div className="p-6 sm:p-8 flex flex-col gap-6">
-                <div className="max-w-2xl">
-                  <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
-                    <span>INTERACTIVE SANDBOX</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
-                    Run Asha&apos;s First Line
-                  </h3>
-                  <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
-                    Experiment with Python directly in your browser. Edit the code, hit Run, and watch real Python execute via in-browser WebAssembly.
-                  </p>
+              {/* Practice / Test mode switcher */}
+              <div className="px-4 sm:px-6 pt-5 pb-0 flex flex-wrap items-center justify-between gap-3">
+                {/* Segmented pill switch */}
+                <div
+                  role="tablist"
+                  aria-label="Sandbox mode"
+                  className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#FAF4ED] border border-[#E6DCC8]"
+                >
+                  {(["practice", "test"] as SandboxMode[]).map((mode) => {
+                    const isActive = sandboxMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        onClick={() => setSandboxMode(mode)}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-1 capitalize ${
+                          isActive
+                            ? "bg-[#C1502E] text-white shadow-xs"
+                            : "text-[#6B6058] hover:text-[#2B2521] hover:bg-[#F1E2CF]"
+                        }`}
+                      >
+                        {mode}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Embedded Real Pyodide Sandbox Playground */}
-                <div className="w-full rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/60 p-4 sm:p-6 overflow-hidden">
-                  <SandboxPreview />
-                </div>
+                {/* Best score badge — rendered by SandboxTest internally, shown here for quick glance */}
+                {sandboxMode === "test" && (
+                  <span className="text-xs font-mono text-[#6B6058]">
+                    Episode 1 · 6 questions
+                  </span>
+                )}
+              </div>
+
+              {/* Main Content Area */}
+              <div className="p-6 sm:p-8 flex flex-col gap-6">
+                {sandboxMode === "practice" && (
+                  <>
+                    <div className="max-w-2xl">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
+                        <span>INTERACTIVE SANDBOX</span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
+                        Run Asha&apos;s First Line
+                      </h3>
+                      <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
+                        Experiment with Python directly in your browser. Edit the code, hit Run, and watch real Python execute via in-browser WebAssembly.
+                      </p>
+                    </div>
+
+                    {/* Embedded Real Pyodide Sandbox Playground */}
+                    <div className="w-full rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/60 p-4 sm:p-6 overflow-hidden">
+                      <SandboxPreview />
+                    </div>
+                  </>
+                )}
+
+                {sandboxMode === "test" && (
+                  <>
+                    <div className="max-w-2xl">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
+                        <span>CODING TEST</span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
+                        Episode 1 Test
+                      </h3>
+                      <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
+                        Six short coding questions based on what Episode 1 teaches. Write the code, hit Submit, and get instant feedback.
+                      </p>
+                    </div>
+
+                    <SandboxTest
+                      questions={episode1TestQuestions}
+                      episodeKey="module-1-episode-1"
+                      onBackToPractice={() => setSandboxMode("practice")}
+                    />
+                  </>
+                )}
               </div>
 
               {/* Footer Info */}
