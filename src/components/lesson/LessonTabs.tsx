@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import { PlayCircle, BookOpen, Code2, HelpCircle } from "lucide-react";
 
-export type LessonTabId = "watch" | "story" | "sandbox" | "quiz";
+export type LessonTabId = "watch" | "story" | "sandbox" | "quiz" | "3d";
 
 export interface TabConfig {
   id: LessonTabId;
@@ -54,10 +54,12 @@ interface LessonTabsProps {
   onTabChange: (tabId: LessonTabId) => void;
   tabOverrides?: Partial<Record<LessonTabId, Partial<TabConfig>>>;
   hiddenTabs?: LessonTabId[];
+  extraTabs?: TabConfig[];
 }
 
-export function LessonTabs({ activeTab, onTabChange, tabOverrides, hiddenTabs }: LessonTabsProps) {
-  const tabs = LESSON_TABS
+export function LessonTabs({ activeTab, onTabChange, tabOverrides, hiddenTabs, extraTabs }: LessonTabsProps) {
+  const allTabs = [...LESSON_TABS, ...(extraTabs || [])];
+  const tabs = allTabs
     .filter((tab) => !hiddenTabs?.includes(tab.id))
     .map((tab) => ({
       ...tab,

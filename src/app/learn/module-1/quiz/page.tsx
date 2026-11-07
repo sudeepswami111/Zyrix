@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ChevronRight,
   ArrowLeft,
+  ArrowRight,
   Compass,
   Layers,
   HelpCircle,
@@ -90,13 +91,13 @@ export default function Module1QuizPage() {
             <span>Previous: Episode 2 (Assign a Value to a Variable)</span>
           </Link>
 
-          {/* Back to Curriculum */}
+          {/* Next to Episode 3 */}
           <Link
-            href="/#curriculum"
+            href="/learn/module-1/episode-3"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[#E6DCC8] bg-white hover:bg-[#FAF4ED] text-sm font-medium text-[#2B2521] hover:text-[#C1502E] transition-all shadow-xs group"
           >
-            <Compass className="w-4 h-4 text-[#6B6058] group-hover:text-[#C1502E] transition-transform" />
-            <span>Back to Curriculum</span>
+            <span>Next: Episode 3 (Operators)</span>
+            <ArrowRight className="w-4 h-4 text-[#6B6058] group-hover:text-[#C1502E] transition-transform group-hover:translate-x-0.5" />
           </Link>
         </nav>
       </main>
