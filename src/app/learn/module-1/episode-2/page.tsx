@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -237,15 +237,14 @@ export default function Episode2Page() {
             <span>Previous: Episode 1 (What Is Python?)</span>
           </Link>
 
-          {/* Next Episode 3 Link */}
-          <div
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/70 text-sm font-medium text-[#A89F91] cursor-not-allowed select-none"
-            aria-disabled="true"
-            title="Episode 3 will be available in the next release"
+          {/* Next: Quiz Link */}
+          <Link
+            href="/learn/module-1/quiz"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[#E6DCC8] bg-white hover:bg-[#FAF4ED] text-sm font-medium text-[#2B2521] hover:text-[#C1502E] transition-all shadow-xs group"
           >
-            <span>Next: Episode 3 (Data Types &amp; Operations)</span>
-            <ArrowRight className="w-4 h-4 text-[#C5B8A5]" />
-          </div>
+            <span>Next: Quiz</span>
+            <ArrowRight className="w-4 h-4 text-[#6B6058] group-hover:text-[#C1502E] transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </nav>
       </main>
 
