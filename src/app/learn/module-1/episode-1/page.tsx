@@ -184,7 +184,7 @@ export default function Episode1Page() {
                 {/* Best score badge — rendered by SandboxTest internally, shown here for quick glance */}
                 {sandboxMode === "test" && (
                   <span className="text-xs font-mono text-[#6B6058]">
-                    Episode 1 · 6 questions
+                    Episode 1 · {episode1TestQuestions.length} questions
                   </span>
                 )}
               </div>
@@ -222,7 +222,7 @@ export default function Episode1Page() {
                         Episode 1 Test
                       </h3>
                       <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
-                        Six short coding questions based on what Episode 1 teaches. Write the code, hit Submit, and get instant feedback.
+                        Short coding questions based on what Episode 1 teaches. Write the code, hit Submit, and get instant feedback.
                       </p>
                     </div>
 

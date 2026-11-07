@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   XCircle,
   RotateCcw,
+  ChevronLeft,
   ChevronRight,
   SkipForward,
   Terminal,
@@ -274,6 +275,8 @@ interface ResultBannerProps {
   message: string;
   onNext: () => void;
   onSkip: () => void;
+  onPrev?: () => void;
+  canPrev?: boolean;
   isLastQuestion: boolean;
   canNext: boolean;
   reducedMotion: boolean;
@@ -284,6 +287,8 @@ function ResultBanner({
   message,
   onNext,
   onSkip,
+  onPrev,
+  canPrev = false,
   isLastQuestion,
   canNext,
   reducedMotion,
@@ -312,6 +317,17 @@ function ResultBanner({
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
+        {canPrev && onPrev && (
+          <button
+            type="button"
+            onClick={onPrev}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#2B2521] hover:bg-[#382E28] text-[#D8CEBC] border border-[#4A3F37] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C1502E]"
+            aria-label="Go to previous question"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            Previous
+          </button>
+        )}
         {!passed && (
           <button
             type="button"
@@ -483,6 +499,17 @@ export interface SandboxTestProps {
   onBackToPractice: () => void;
 }
 
+interface QuestionSessionState {
+  code: string;
+  hintShown: boolean;
+  hintsUsed: number;
+  runStdout: string | null;
+  runError: string | null;
+  hasRun: boolean;
+  gradeResult: GradeResult | null;
+  canAdvance: boolean;
+}
+
 export function SandboxTest({
   questions,
   episodeKey,
@@ -509,8 +536,9 @@ export function SandboxTest({
   const [gradeResult, setGradeResult] = useState<GradeResult | null>(null);
   const [canAdvance, setCanAdvance] = useState(false);
 
-  // Per-question result accumulator
+  // Per-question result accumulator & session cache
   const [results, setResults] = useState<QuestionResult[]>([]);
+  const [sessionStates, setSessionStates] = useState<Record<number, QuestionSessionState>>({});
   const [showResults, setShowResults] = useState(false);
 
   // Best score (read once on mount)
@@ -599,6 +627,53 @@ export function SandboxTest({
     }
   }, [hintShown]);
 
+  // ── Previous ──────────────────────────────────────────────────────────────
+  const handlePrev = useCallback(() => {
+    if (qIndex <= 0) return;
+    const prevIdx = qIndex - 1;
+
+    setSessionStates((prev) => ({
+      ...prev,
+      [qIndex]: {
+        code,
+        hintShown,
+        hintsUsed: hintsUsedThisQ,
+        runStdout,
+        runError,
+        hasRun,
+        gradeResult,
+        canAdvance,
+      },
+    }));
+
+    const prevSession = sessionStates[prevIdx];
+    if (prevSession) {
+      setCode(prevSession.code);
+      setHintShown(prevSession.hintShown);
+      setHintsUsedThisQ(prevSession.hintsUsed);
+      setRunStdout(prevSession.runStdout);
+      setRunError(prevSession.runError);
+      setHasRun(prevSession.hasRun);
+      setGradeResult(prevSession.gradeResult);
+      setCanAdvance(prevSession.canAdvance);
+    } else {
+      resetForQuestion(prevIdx);
+    }
+    setQIndex(prevIdx);
+  }, [
+    qIndex,
+    code,
+    hintShown,
+    hintsUsedThisQ,
+    runStdout,
+    runError,
+    hasRun,
+    gradeResult,
+    canAdvance,
+    sessionStates,
+    resetForQuestion,
+  ]);
+
   // ── Skip ──────────────────────────────────────────────────────────────────
   const handleSkip = useCallback(() => {
     if (!question) return;
@@ -607,27 +682,60 @@ export function SandboxTest({
       skipped: true,
       hintsUsed: hintsUsedThisQ,
     };
-    const newResults = [...results, skippedResult];
+    const newResults = [...results];
+    newResults[qIndex] = skippedResult;
     setResults(newResults);
+
+    setSessionStates((prev) => ({
+      ...prev,
+      [qIndex]: {
+        code,
+        hintShown,
+        hintsUsed: hintsUsedThisQ,
+        runStdout,
+        runError,
+        hasRun,
+        gradeResult: { passed: false, message: "Question skipped." },
+        canAdvance: true,
+      },
+    }));
 
     if (isLastQuestion) {
       writeBestScore(
         episodeKey,
-        newResults.filter((r) => r.passed).length
+        newResults.filter((r) => r?.passed).length
       );
       setShowResults(true);
     } else {
       const next = qIndex + 1;
+      const nextSession = sessionStates[next];
+      if (nextSession) {
+        setCode(nextSession.code);
+        setHintShown(nextSession.hintShown);
+        setHintsUsedThisQ(nextSession.hintsUsed);
+        setRunStdout(nextSession.runStdout);
+        setRunError(nextSession.runError);
+        setHasRun(nextSession.hasRun);
+        setGradeResult(nextSession.gradeResult);
+        setCanAdvance(nextSession.canAdvance);
+      } else {
+        resetForQuestion(next);
+      }
       setQIndex(next);
-      resetForQuestion(next);
     }
   }, [
     question,
     hintsUsedThisQ,
     results,
+    qIndex,
+    code,
+    hintShown,
+    runStdout,
+    runError,
+    hasRun,
     isLastQuestion,
     episodeKey,
-    qIndex,
+    sessionStates,
     resetForQuestion,
   ]);
 
@@ -640,28 +748,62 @@ export function SandboxTest({
       skipped: false,
       hintsUsed: hintsUsedThisQ,
     };
-    const newResults = [...results, passedResult];
+    const newResults = [...results];
+    newResults[qIndex] = passedResult;
     setResults(newResults);
+
+    setSessionStates((prev) => ({
+      ...prev,
+      [qIndex]: {
+        code,
+        hintShown,
+        hintsUsed: hintsUsedThisQ,
+        runStdout,
+        runError,
+        hasRun,
+        gradeResult,
+        canAdvance,
+      },
+    }));
 
     if (isLastQuestion) {
       writeBestScore(
         episodeKey,
-        newResults.filter((r) => r.passed).length
+        newResults.filter((r) => r?.passed).length
       );
       setShowResults(true);
     } else {
       const next = qIndex + 1;
+      const nextSession = sessionStates[next];
+      if (nextSession) {
+        setCode(nextSession.code);
+        setHintShown(nextSession.hintShown);
+        setHintsUsedThisQ(nextSession.hintsUsed);
+        setRunStdout(nextSession.runStdout);
+        setRunError(nextSession.runError);
+        setHasRun(nextSession.hasRun);
+        setGradeResult(nextSession.gradeResult);
+        setCanAdvance(nextSession.canAdvance);
+      } else {
+        resetForQuestion(next);
+      }
       setQIndex(next);
-      resetForQuestion(next);
     }
   }, [
     canAdvance,
     question,
     hintsUsedThisQ,
     results,
+    qIndex,
+    code,
+    hintShown,
+    runStdout,
+    runError,
+    hasRun,
+    gradeResult,
     isLastQuestion,
     episodeKey,
-    qIndex,
+    sessionStates,
     resetForQuestion,
   ]);
 
@@ -669,6 +811,7 @@ export function SandboxTest({
   const handleRetake = useCallback(() => {
     setQIndex(0);
     setResults([]);
+    setSessionStates({});
     setShowResults(false);
     resetForQuestion(0);
   }, [resetForQuestion]);
@@ -903,15 +1046,31 @@ export function SandboxTest({
           message={gradeResult.message}
           onNext={handleNext}
           onSkip={handleSkip}
+          onPrev={handlePrev}
+          canPrev={qIndex > 0}
           isLastQuestion={isLastQuestion}
           canNext={canAdvance}
           reducedMotion={reducedMotion}
         />
       )}
 
-      {/* Skip without submitting (always available) */}
+      {/* Navigation row: Previous question (when qIndex > 0) and Skip (when not graded) */}
       {!gradeResult && (
-        <div className="flex justify-end">
+        <div className="flex items-center justify-between">
+          {qIndex > 0 ? (
+            <button
+              type="button"
+              onClick={handlePrev}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[#8C7E72] hover:text-[#2B2521] hover:bg-[#FAF4ED] border border-transparent hover:border-[#E6DCC8] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C1502E]"
+              aria-label={`Go to previous question (Question ${qIndex})`}
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              Previous question
+            </button>
+          ) : (
+            <div />
+          )}
+
           <button
             type="button"
             onClick={handleSkip}

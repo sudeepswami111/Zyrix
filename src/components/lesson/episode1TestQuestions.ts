@@ -37,18 +37,6 @@ export interface TestQuestion {
 
 export const episode1TestQuestions: TestQuestion[] = [
   {
-    id: "e1t1",
-    prompt:
-      "Asha's terminal is open and waiting. Print the text Hello, Python! — exactly like that, with the exclamation mark.",
-    starter: "",
-    expectedOutput: "Hello, Python!",
-    sourceCheck: /print\s*\(/,
-    sourceFailMessage: "Use the print() function to display the text.",
-    hint: 'Try: print("Hello, Python!")',
-    passMessage: 'print() is Python\'s way of sending text to the screen — your first line of real code!',
-    failMessage: 'Make sure the output reads exactly: Hello, Python! (capital H, exclamation mark at the end).',
-  },
-  {
     id: "e1t2",
     prompt:
       "Spot the bug! Rahul sent Asha this snippet, but it crashes. Fix it so it prints: Scores analyzed!",
@@ -90,21 +78,6 @@ export const episode1TestQuestions: TestQuestion[] = [
       "Great! print() works with any text. You can put anything you like between the quotes.",
     failMessage:
       "Make sure your code calls print() with your name inside, and that the output isn't empty.",
-  },
-  {
-    id: "e1t5",
-    prompt:
-      "Asha discovered you can use print() more than once. Print two lines: first Python is fun, then I can code — each as a separate print() call.",
-    starter: "",
-    expectedOutput: "Python is fun\nI can code",
-    sourceCheck: /print\s*\(.*\)[\s\S]*print\s*\(/,
-    sourceFailMessage:
-      "Use two separate print() calls — one for each line.",
-    hint: 'Call print() twice, one line at a time:\nprint("Python is fun")\nprint("I can code")',
-    passMessage:
-      "Each print() call adds a new line. You can chain as many as you need.",
-    failMessage:
-      'The output must be exactly two lines: first "Python is fun", then "I can code".',
   },
   {
     id: "e1t6",
