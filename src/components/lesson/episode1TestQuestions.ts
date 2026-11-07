@@ -15,11 +15,11 @@ export interface TestQuestion {
   /** Exact expected stdout after trimming trailing whitespace per line */
   expectedOutput: string;
   /**
-   * Optional source check – a regex that must match the submitted code.
+   * Optional source check – a regex or predicate that must match the submitted code.
    * When present, a submission that passes the output check but fails the
    * source check is still marked failed (with the sourceFailMessage).
    */
-  sourceCheck?: RegExp;
+  sourceCheck?: RegExp | ((code: string) => boolean);
   /** Message shown when the source check fails */
   sourceFailMessage?: string;
   /**
@@ -33,6 +33,10 @@ export interface TestQuestion {
   passMessage: string;
   /** One-line message shown on an incorrect submission */
   failMessage: string;
+  /**
+   * Optional custom fail message resolver (e.g. specific check on stdout or code)
+   */
+  customFailMessage?: (stdout: string, code: string) => string | null;
 }
 
 export const episode1TestQuestions: TestQuestion[] = [

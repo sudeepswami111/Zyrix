@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import {
@@ -18,9 +18,13 @@ const STARTER_CODE = `print("Exam scores analyzed!")`;
 
 interface SandboxPreviewProps {
   initialCode?: string;
+  customTip?: React.ReactNode;
 }
 
-export function SandboxPreview({ initialCode = STARTER_CODE }: SandboxPreviewProps = {}) {
+export function SandboxPreview({
+  initialCode = STARTER_CODE,
+  customTip,
+}: SandboxPreviewProps = {}) {
   const [code, setCode] = useState(initialCode);
   const {
     isLoading,
@@ -239,10 +243,14 @@ export function SandboxPreview({ initialCode = STARTER_CODE }: SandboxPreviewPro
       {/* Light Nudge Toward Experimentation */}
       <div className="px-4 py-3 rounded-xl bg-white border border-[#E6DCC8] shadow-xs flex items-center gap-2.5 text-xs text-[#2B2521]">
         <Sparkles className="w-4 h-4 text-[#C1502E] shrink-0" />
-        <p className="text-xs sm:text-sm text-[#6B6058]">
-          <strong className="text-[#2B2521] font-medium">Try it yourself:</strong>{" "}
-          Try changing the text inside the quotes to something else (e.g. your name or favorite dataset) and hit <span className="font-semibold text-[#C1502E]">Run</span> again!
-        </p>
+        {customTip ? (
+          <div className="text-xs sm:text-sm text-[#6B6058]">{customTip}</div>
+        ) : (
+          <p className="text-xs sm:text-sm text-[#6B6058]">
+            <strong className="text-[#2B2521] font-medium">Try it yourself:</strong>{" "}
+            Try changing the text inside the quotes to something else (e.g. your name or favorite dataset) and hit <span className="font-semibold text-[#C1502E]">Run</span> again!
+          </p>
+        )}
       </div>
     </div>
   );

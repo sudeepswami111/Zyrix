@@ -86,23 +86,37 @@ function grade(
     return { passed: false, message: `Python error: ${plain}` };
   }
 
-  // Source check first (independent of output)
-  if (question.sourceCheck && !question.sourceCheck.test(code)) {
-    return { passed: false, message: question.sourceFailMessage ?? question.failMessage };
+  const got = normalise(stdout);
+  const expected = normalise(question.expectedOutput);
+
+  // Custom fail message check (e.g. specific intermediate mistaken output like "5" for =+)
+  if (question.customFailMessage) {
+    const custom = question.customFailMessage(got, code);
+    if (custom) {
+      return { passed: false, message: custom };
+    }
+  }
+
+  // Source check (independent of output)
+  if (question.sourceCheck) {
+    const passed =
+      typeof question.sourceCheck === "function"
+        ? question.sourceCheck(code)
+        : question.sourceCheck.test(code);
+    if (!passed) {
+      return { passed: false, message: question.sourceFailMessage ?? question.failMessage };
+    }
   }
 
   // Any non-empty output mode (e.g. "print your name")
   if (question.anyNonEmptyOutput) {
-    const trimmed = normalise(stdout);
-    if (trimmed.length === 0) {
+    if (got.length === 0) {
       return { passed: false, message: question.failMessage };
     }
     return { passed: true, message: question.passMessage };
   }
 
   // Exact output match
-  const got = normalise(stdout);
-  const expected = normalise(question.expectedOutput);
   if (got === expected) {
     return { passed: true, message: question.passMessage };
   }
