@@ -19,6 +19,8 @@ export interface TraceObject {
   opacity?: number;
   /** Normalised position hint [x, y, z] – the renderer may interpret freely */
   position?: [number, number, number];
+  /** Optional scale hint [sx, sy, sz] or uniform scale number */
+  scale?: [number, number, number] | number;
   color?: "terracotta" | "cream" | "sand" | "dim" | "highlight";
 }
 

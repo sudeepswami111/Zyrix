@@ -1,83 +1,153 @@
 "use client";
 
 /**
- * OperatorScene — Pure WebGL / React Three Fiber scene for Episode 3 3D Tab.
+ * OperatorScene — High-fidelity 3D WebGL Scene for Episode 3.
  *
- * Uses native Three.js CanvasTexture for labels — 100% GPU-accelerated, zero DOM
- * portal issues, zero external font network requests.
+ * Features:
+ *   - Tactile rounded 3D cards with chamfered bevels (RoundedBox)
+ *   - Studio 3-point lighting + soft ContactShadows
+ *   - HiDPI 1024x512 CanvasTextures with dynamic text auto-fitting
+ *   - In-memory texture caching to eliminate GPU compile hitches
+ *   - Critically damped spring lerp + subtle organic floating hover
+ *   - Fully reactive to prefers-reduced-motion and DPR capped at 2
  */
 
 import React, { useRef, useMemo, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { RoundedBox, ContactShadows, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { TraceStep, TraceObject } from "./trace";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   CANVAS TEXTURE GENERATOR FOR BOX LABELS
+   TEXTURE CACHE — Avoids reallocating CanvasTextures during animation
    ────────────────────────────────────────────────────────────────────────── */
-function makeLabelTexture(
+const textureCache = new Map<string, THREE.CanvasTexture>();
+
+function getOrCreateLabelTexture(
   label: string | undefined,
   value: string | number | undefined,
   color: TraceObject["color"]
 ): THREE.CanvasTexture {
+  const cacheKey = `${label ?? ""}|${value ?? ""}|${color ?? "dim"}`;
+  const existing = textureCache.get(cacheKey);
+  if (existing) return existing;
+
   const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 256;
+  canvas.width = 1024;
+  canvas.height = 512;
   const ctx = canvas.getContext("2d");
 
   if (ctx) {
-    // Background fill matching box tone
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
     const isTerracotta = color === "terracotta";
     const isHighlight = color === "highlight";
-    const bg = isTerracotta
-      ? "#C1502E"
-      : isHighlight
-      ? "#E8956B"
-      : color === "sand"
-      ? "#D8CAB6"
-      : "#EDE0D0";
+    const isSand = color === "sand";
 
-    ctx.fillStyle = bg;
+    // Card background fill with subtle glossy vertical gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, 512);
+    if (isTerracotta) {
+      grad.addColorStop(0, "#C95533");
+      grad.addColorStop(1, "#A43719");
+    } else if (isHighlight) {
+      grad.addColorStop(0, "#E88756");
+      grad.addColorStop(1, "#CF6538");
+    } else if (isSand) {
+      grad.addColorStop(0, "#E4DACB");
+      grad.addColorStop(1, "#D0C1AE");
+    } else {
+      // Cream
+      grad.addColorStop(0, "#FAF6F0");
+      grad.addColorStop(1, "#EDE4D6");
+    }
+
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.roundRect(10, 10, 492, 236, 28);
+    ctx.roundRect(16, 16, 992, 480, 44);
     ctx.fill();
 
-    // Subtle border
-    ctx.strokeStyle = isTerracotta ? "#9B361B" : "#C0B29E";
+    // Inset border
+    ctx.strokeStyle = isTerracotta
+      ? "rgba(255, 255, 255, 0.28)"
+      : isHighlight
+      ? "rgba(255, 255, 255, 0.3)"
+      : "rgba(180, 165, 145, 0.55)";
     ctx.lineWidth = 8;
     ctx.stroke();
 
-    // Value text
-    if (value !== undefined) {
-      ctx.fillStyle = isTerracotta ? "#FFFFFF" : "#1A1210";
-      ctx.font = "bold 76px 'JetBrains Mono', monospace, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      const yPos = label ? 96 : 128;
-      ctx.fillText(String(value), 256, yPos);
-    }
+    const hasValue = value !== undefined;
+    const hasLabel = Boolean(label);
 
-    // Label text
-    if (label) {
-      ctx.fillStyle = isTerracotta ? "#F5EDE0" : "#6B6058";
-      ctx.font = "bold 38px 'JetBrains Mono', monospace, sans-serif";
+    // Operator Glyph Hero Mode (e.g. machine in the middle with only operator symbol)
+    if (!hasValue && hasLabel) {
+      ctx.fillStyle = isTerracotta ? "#FFFFFF" : "#1A1210";
+      ctx.font = "bold 130px 'JetBrains Mono', monospace, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      const yPos = value !== undefined ? 180 : 128;
-      ctx.fillText(label, 256, yPos);
+      ctx.fillText(label!, 512, 256);
+    } else {
+      // Top Label Chip / Pill
+      if (hasLabel) {
+        ctx.font = "600 34px 'JetBrains Mono', monospace, sans-serif";
+        const labelText = label!.toUpperCase();
+        const textMetrics = ctx.measureText(labelText);
+        const pillWidth = Math.max(textMetrics.width + 48, 120);
+        const pillHeight = 52;
+        const pillX = 512 - pillWidth / 2;
+        const pillY = 64;
+
+        // Pill background
+        ctx.fillStyle = isTerracotta
+          ? "rgba(0, 0, 0, 0.18)"
+          : isHighlight
+          ? "rgba(0, 0, 0, 0.15)"
+          : "rgba(107, 96, 88, 0.12)";
+        ctx.beginPath();
+        ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 26);
+        ctx.fill();
+
+        // Pill text
+        ctx.fillStyle = isTerracotta
+          ? "#FDF9F5"
+          : isHighlight
+          ? "#FFFFFF"
+          : "#6B6058";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(labelText, 512, pillY + pillHeight / 2 + 2);
+      }
+
+      // Hero Value Text with dynamic auto-sizing
+      if (hasValue) {
+        const valStr = String(value);
+        let fontSize = 96;
+        if (valStr.length > 12) fontSize = 48;
+        else if (valStr.length > 7) fontSize = 62;
+        else if (valStr.length > 4) fontSize = 78;
+
+        ctx.fillStyle = isTerracotta ? "#FFFFFF" : isHighlight ? "#FFFFFF" : "#1A1210";
+        ctx.font = `bold ${fontSize}px 'JetBrains Mono', monospace, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        const valY = hasLabel ? 300 : 256;
+        ctx.fillText(valStr, 512, valY);
+      }
     }
   }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.minFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
   texture.needsUpdate = true;
+
+  textureCache.set(cacheKey, texture);
   return texture;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   BOX COMPONENT WITH TEXTURE & LERP ANIMATION
+   3D SCENE BOX WITH ROUNDED EDGES & ORGANIC SPRING INTERPOLATION
    ────────────────────────────────────────────────────────────────────────── */
 interface SceneBoxProps {
   obj: TraceObject;
@@ -89,25 +159,39 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
   const matRef = useRef<THREE.MeshStandardMaterial>(null);
 
   const isBlock = obj.kind === "block";
+
+  // Persistent motion targets & state
   const targetPos = useMemo(
     () => new THREE.Vector3(...(obj.position ?? [0, 0, 0])),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [obj.position?.[0], obj.position?.[1], obj.position?.[2]]
   );
+
+  const targetScale = useMemo(() => {
+    if (typeof obj.scale === "number") {
+      return new THREE.Vector3(obj.scale, obj.scale, obj.scale);
+    }
+    if (Array.isArray(obj.scale)) {
+      return new THREE.Vector3(...obj.scale);
+    }
+    return new THREE.Vector3(1, 1, 1);
+  }, [obj.scale]);
+
   const targetOpacity = obj.opacity ?? 1;
 
-  // Generate label texture for non-block objects
+  // Track smoothed coordinates across frames
+  const currentPos = useRef(targetPos.clone());
+  const currentScale = useRef(targetScale.clone());
+  const currentOpacity = useRef(targetOpacity);
+
+  // Micro-hover phase offset unique to each object
+  const floatOffset = useRef(Math.random() * Math.PI * 2);
+
+  // Fetch cached texture
   const texture = useMemo(() => {
     if (isBlock) return null;
-    return makeLabelTexture(obj.label, obj.value, obj.color);
+    return getOrCreateLabelTexture(obj.label, obj.value, obj.color);
   }, [isBlock, obj.label, obj.value, obj.color]);
-
-  // Cleanup texture on unmount
-  useEffect(() => {
-    return () => {
-      texture?.dispose();
-    };
-  }, [texture]);
 
   // Color mapping
   const boxColor = useMemo(() => {
@@ -122,7 +206,7 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
         return new THREE.Color("#EDE0D0");
       case "dim":
       default:
-        return new THREE.Color("#8C7E72");
+        return new THREE.Color("#7D6F66");
     }
   }, [obj.color]);
 
@@ -131,23 +215,36 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
 
     if (reducedMotion) {
       groupRef.current.position.copy(targetPos);
+      groupRef.current.scale.copy(targetScale);
       if (matRef.current) {
         matRef.current.opacity = targetOpacity;
-        matRef.current.emissiveIntensity = obj.glow ? 0.8 : 0;
+        matRef.current.emissiveIntensity = obj.glow ? 0.75 : 0;
       }
       return;
     }
 
-    const lerpRate = 1 - Math.exp(-6 * delta);
-    groupRef.current.position.lerp(targetPos, lerpRate);
+    // Critically-damped exponential spring interpolation
+    const lerpRate = 1 - Math.exp(-8.5 * delta);
+    currentPos.current.lerp(targetPos, lerpRate);
+    currentScale.current.lerp(targetScale, lerpRate);
+    currentOpacity.current += (targetOpacity - currentOpacity.current) * lerpRate;
 
+    // Apply smooth position and scale
+    groupRef.current.position.copy(currentPos.current);
+    groupRef.current.scale.copy(currentScale.current);
+
+    // Subtle organic breathing hover on Y axis
+    const hoverY = Math.sin(_state.clock.elapsedTime * 2.2 + floatOffset.current) * 0.025;
+    groupRef.current.position.y += hoverY;
+
+    // Smooth opacity and pulsating emissive glow
     if (matRef.current) {
-      matRef.current.opacity += (targetOpacity - matRef.current.opacity) * lerpRate;
+      matRef.current.opacity = currentOpacity.current;
       if (obj.glow) {
-        const pulse = 0.6 + 0.4 * Math.sin(_state.clock.elapsedTime * 3);
+        const pulse = 0.55 + 0.45 * Math.sin(_state.clock.elapsedTime * 3.2);
         matRef.current.emissiveIntensity = pulse;
       } else {
-        matRef.current.emissiveIntensity *= 0.88;
+        matRef.current.emissiveIntensity *= 0.85;
         if (matRef.current.emissiveIntensity < 0.01) {
           matRef.current.emissiveIntensity = 0;
         }
@@ -155,11 +252,17 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
     }
   });
 
+  // Small block for Divide mode
   if (isBlock) {
     return (
       <group ref={groupRef} position={targetPos}>
-        <mesh castShadow receiveShadow>
-          <boxGeometry args={[0.38, 0.38, 0.16]} />
+        <RoundedBox
+          args={[0.38, 0.38, 0.18]}
+          radius={0.06}
+          smoothness={3}
+          castShadow
+          receiveShadow
+        >
           <meshStandardMaterial
             ref={matRef}
             color={boxColor}
@@ -167,20 +270,25 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
             emissiveIntensity={obj.glow ? 0.8 : 0}
             transparent
             opacity={targetOpacity}
-            roughness={0.4}
-            metalness={0.05}
+            roughness={0.28}
+            metalness={0.08}
           />
-        </mesh>
+        </RoundedBox>
       </group>
     );
   }
 
-  // Value / Machine / Result Box
+  // Hero Card Box (for numbers, variables, and operator machine)
   return (
     <group ref={groupRef} position={targetPos}>
-      {/* 3D Box Base */}
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[1.5, 0.82, 0.22]} />
+      {/* Tactile Chamfered Box Base */}
+      <RoundedBox
+        args={[1.42, 0.78, 0.22]}
+        radius={0.07}
+        smoothness={4}
+        castShadow
+        receiveShadow
+      >
         <meshStandardMaterial
           ref={matRef}
           color={boxColor}
@@ -188,20 +296,21 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
           emissiveIntensity={obj.glow ? 0.8 : 0}
           transparent
           opacity={targetOpacity}
-          roughness={0.45}
-          metalness={0.06}
+          roughness={0.3}
+          metalness={0.08}
         />
-      </mesh>
+      </RoundedBox>
 
-      {/* Front Face Texture with crisp text */}
+      {/* Front Face Plane with Crisp HiDPI Card Texture */}
       {texture && (
-        <mesh position={[0, 0, 0.115]}>
-          <planeGeometry args={[1.46, 0.78]} />
+        <mesh position={[0, 0, 0.113]}>
+          <planeGeometry args={[1.36, 0.72]} />
           <meshBasicMaterial
             map={texture}
             transparent
             opacity={targetOpacity}
             toneMapped={false}
+            depthWrite={false}
           />
         </mesh>
       )}
@@ -210,7 +319,7 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   SCENE ENVIRONMENT
+   SCENE ENVIRONMENT & LIGHTING
    ────────────────────────────────────────────────────────────────────────── */
 interface SceneContentProps {
   step: TraceStep;
@@ -220,14 +329,26 @@ interface SceneContentProps {
 function SceneContent({ step, reducedMotion }: SceneContentProps) {
   return (
     <>
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[5, 7, 5]} intensity={1.2} castShadow />
-      <directionalLight position={[-4, -3, 3]} intensity={0.35} color="#FAF4ED" />
+      {/* Studio Lighting */}
+      <ambientLight intensity={0.75} />
+      <directionalLight position={[6, 8, 6]} intensity={1.3} castShadow />
+      <directionalLight position={[-6, 4, 3]} intensity={0.45} color="#FAF4ED" />
+      <directionalLight position={[0, 5, -6]} intensity={0.6} color="#FFFFFF" />
 
-      {/* Grid Floor */}
+      {/* Soft Contact Shadows on Ground */}
+      <ContactShadows
+        position={[0, -2.15, 0]}
+        opacity={0.42}
+        scale={14}
+        blur={2.4}
+        far={4.5}
+        color="#5C4535"
+      />
+
+      {/* Elegant Faint Grid Floor */}
       <gridHelper
-        args={[16, 16, "#E6DCC8", "#EFE7DA"]}
-        position={[0, -2.4, 0]}
+        args={[18, 24, "#D8C7B3", "#EFE5D8"]}
+        position={[0, -2.16, 0]}
       />
 
       {/* Render all trace objects */}
@@ -235,13 +356,13 @@ function SceneContent({ step, reducedMotion }: SceneContentProps) {
         <SceneBox key={obj.id} obj={obj} reducedMotion={reducedMotion} />
       ))}
 
-      {/* Controlled Orbit */}
+      {/* Controlled Camera Orbit */}
       <OrbitControls
         enablePan={false}
-        maxPolarAngle={Math.PI * 0.75}
-        minPolarAngle={Math.PI * 0.2}
-        minDistance={3.8}
-        maxDistance={14}
+        maxPolarAngle={Math.PI * 0.72}
+        minPolarAngle={Math.PI * 0.22}
+        minDistance={4.0}
+        maxDistance={12.5}
         makeDefault
       />
     </>
@@ -265,14 +386,14 @@ export default function OperatorSceneCanvas({
   return (
     <div className="w-full h-full relative select-none">
       <Canvas
-        camera={{ position: [0, 0, 7.8], fov: 40 }}
+        camera={{ position: [0, 0.3, 7.6], fov: 38 }}
         dpr={[1, 2]}
-        gl={{ antialias: true, alpha: false }}
-        style={{ width: "100%", height: "100%", background: "#F8F1E8" }}
+        gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+        style={{ width: "100%", height: "100%", background: "#FAF5EE" }}
         aria-label={ariaLabel}
         role="region"
       >
-        <color attach="background" args={["#F8F1E8"]} />
+        <color attach="background" args={["#FAF5EE"]} />
         <SceneContent step={step} reducedMotion={reducedMotion} />
       </Canvas>
     </div>
