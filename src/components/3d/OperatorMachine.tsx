@@ -19,7 +19,6 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import dynamic from "next/dynamic";
 import {
   Play,
   Pause,
@@ -40,25 +39,9 @@ import {
   type AssignInputs,
 } from "./episode3Traces";
 import type { TraceConfig } from "./trace";
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   DYNAMIC IMPORT — no SSR
-   ────────────────────────────────────────────────────────────────────────── */
-
-const OperatorSceneCanvas = dynamic(
-  () => import("./OperatorScene"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-[#F8F1E8] rounded-xl">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-[#C1502E] border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-mono text-[#6B6058]">Loading 3D scene…</span>
-        </div>
-      </div>
-    ),
-  }
-);
+// Direct import — this file is itself only loaded via dynamic import (ssr:false)
+// from the page, so we don't need a second nested dynamic import here.
+import OperatorSceneCanvas from "./OperatorScene";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    WEBGL DETECTION
@@ -353,7 +336,11 @@ function FallbackCanvas({ caption }: { caption: string }) {
    ────────────────────────────────────────────────────────────────────────── */
 export default function OperatorMachine() {
   const reducedMotion = usePrefersReducedMotion();
-  const [webgl] = useState(() => typeof window !== "undefined" ? supportsWebGL() : true);
+  const [webgl, setWebgl] = useState(true);
+
+  useEffect(() => {
+    setWebgl(supportsWebGL());
+  }, []);
 
   // ── Mode ─────────────────────────────────────────────────────────────────
   const [mode, setMode] = useState<Mode3D>("arithmetic");
@@ -508,7 +495,7 @@ export default function OperatorMachine() {
 
           {/* Operator badge overlay */}
           {currentStep?.operatorBadge && (
-            <div className="absolute top-3 right-3 w-10 h-10 rounded-xl bg-[#C1502E] flex items-center justify-center shadow-lg">
+            <div className="absolute top-3 right-3 w-10 h-10 rounded-xl bg-[#C1502E] flex items-center justify-center shadow-lg pointer-events-none select-none">
               <span className="font-mono font-bold text-white text-sm">
                 {currentStep.operatorBadge}
               </span>
