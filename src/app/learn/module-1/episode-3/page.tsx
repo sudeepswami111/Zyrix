@@ -23,7 +23,22 @@ import { VideoPreview } from "@/components/formats/previews/VideoPreview";
 import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
 import { SandboxTest } from "@/components/lesson/SandboxTest";
 import { episode3TestQuestions } from "@/components/lesson/episode3TestQuestions";
-import { Viz3DPreview } from "@/components/formats/previews/Viz3DPreview";
+import dynamic from "next/dynamic";
+
+const OperatorMachine = dynamic(
+  () => import("@/components/3d/OperatorMachine"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px] bg-[#FAF4ED] rounded-2xl">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#C1502E] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-mono text-[#6B6058]">Loading 3D visualiser…</span>
+        </div>
+      </div>
+    ),
+  }
+);
 
 type SandboxMode = "practice" | "test";
 
@@ -42,10 +57,10 @@ export default function Episode3Page() {
     {
       id: "3d",
       label: "3D",
-      badge: "Coming soon",
-      isAvailable: false,
+      badge: undefined,
+      isAvailable: true,
       icon: Box,
-      description: "Interactive 3D mathematical space visualization",
+      description: "Interactive 3D operator machine — visualise arithmetic, division and assignment operators live",
     },
   ];
 
@@ -126,10 +141,10 @@ export default function Episode3Page() {
                   "Interactive in-browser Pyodide code environment to experiment with operators live",
               },
               "3d": {
-                badge: "Coming soon",
-                isAvailable: false,
+                badge: undefined,
+                isAvailable: true,
                 description:
-                  "3D mathematical space visualization exploring scalar and vector operations",
+                  "Interactive 3D operator machine — visualise arithmetic, division and assignment operators live",
               },
             }}
           />
@@ -292,15 +307,40 @@ export default function Episode3Page() {
             </div>
           )}
 
-          {/* 3D Tab — Coming Soon Card */}
+          {/* 3D Tab — Interactive Operator Machine */}
           {activeTab === "3d" && (
-            <ComingSoonCard
-              title="3D Operator Vector Geometry"
-              formatName="3D Visualization"
-              description="Explore how arithmetic operators map to transformations, vector spaces, and geometrical operations in 3D."
-              preview={<Viz3DPreview />}
-              roadmapNote="3D loss surface & vector models in production for upcoming release"
-            />
+            <div className="w-full rounded-2xl bg-white border border-[#E6DCC8] shadow-xs overflow-hidden">
+              {/* Header */}
+              <div className="p-4 sm:p-5 border-b border-[#E6DCC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF4ED]/40">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#C1502E]" />
+                  <span className="font-mono text-xs font-semibold text-[#2B2521]">
+                    3D Operator Machine
+                  </span>
+                  <span className="text-[#A89F91]">•</span>
+                  <span className="text-xs font-mono text-[#6B6058]">
+                    WebGL · React Three Fiber
+                  </span>
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1E2CF] text-[#8C3A20] text-xs font-mono font-medium">
+                  <Box className="w-3.5 h-3.5 text-[#C1502E]" />
+                  <span>Live Scene</span>
+                </span>
+              </div>
+
+              <OperatorMachine />
+
+              {/* Footer */}
+              <div className="p-4 sm:p-5 bg-[#FAF4ED]/50 border-t border-[#E6DCC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#6B6058]">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#C1502E] shrink-0" />
+                  <span>Real-time 3D · WebGL · Trace-driven animation</span>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] font-mono text-[#8C7E72]">
+                  <span>Module 1: Episode 3 · 3D Visualiser</span>
+                </div>
+              </div>
+            </div>
           )}
         </section>
 
