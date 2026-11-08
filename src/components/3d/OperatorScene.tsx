@@ -8,7 +8,8 @@
  *   - Studio 3-point lighting + soft ContactShadows
  *   - HiDPI 1024x512 CanvasTextures with dynamic text auto-fitting
  *   - In-memory texture caching to eliminate GPU compile hitches
- *   - Critically damped spring lerp + subtle organic floating hover
+ *   - Physics-backed critically damped spring lerp + dynamic banking tilt
+ *   - Synchronized opacity & smooth color transitions across all faces
  *   - Fully reactive to prefers-reduced-motion and DPR capped at 2
  */
 
@@ -157,6 +158,7 @@ interface SceneBoxProps {
 function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
   const groupRef = useRef<THREE.Group>(null);
   const matRef = useRef<THREE.MeshStandardMaterial>(null);
+  const labelMatRef = useRef<THREE.MeshBasicMaterial>(null);
 
   const isBlock = obj.kind === "block";
 
@@ -179,10 +181,10 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
 
   const targetOpacity = obj.opacity ?? 1;
 
-  // Track smoothed coordinates across frames
+  // Initial mount: start slightly scaled down and faded so new objects bloom into existence
   const currentPos = useRef(targetPos.clone());
-  const currentScale = useRef(targetScale.clone());
-  const currentOpacity = useRef(targetOpacity);
+  const currentScale = useRef(targetScale.clone().multiplyScalar(0.7));
+  const currentOpacity = useRef(0);
 
   // Micro-hover phase offset unique to each object
   const floatOffset = useRef(Math.random() * Math.PI * 2);
@@ -216,15 +218,22 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
     if (reducedMotion) {
       groupRef.current.position.copy(targetPos);
       groupRef.current.scale.copy(targetScale);
+      groupRef.current.rotation.set(0, 0, 0);
       if (matRef.current) {
         matRef.current.opacity = targetOpacity;
+        matRef.current.color.copy(boxColor);
         matRef.current.emissiveIntensity = obj.glow ? 0.75 : 0;
+      }
+      if (labelMatRef.current) {
+        labelMatRef.current.opacity = targetOpacity;
       }
       return;
     }
 
-    // Critically-damped exponential spring interpolation
-    const lerpRate = 1 - Math.exp(-8.5 * delta);
+    // Safe clamped delta to prevent frame-hitch jumps
+    const safeDelta = Math.min(delta, 0.05);
+    const lerpRate = 1 - Math.exp(-9.5 * safeDelta);
+
     currentPos.current.lerp(targetPos, lerpRate);
     currentScale.current.lerp(targetScale, lerpRate);
     currentOpacity.current += (targetOpacity - currentOpacity.current) * lerpRate;
@@ -234,12 +243,19 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
     groupRef.current.scale.copy(currentScale.current);
 
     // Subtle organic breathing hover on Y axis
-    const hoverY = Math.sin(_state.clock.elapsedTime * 2.2 + floatOffset.current) * 0.025;
+    const hoverY = Math.sin(_state.clock.elapsedTime * 2.0 + floatOffset.current) * 0.022;
     groupRef.current.position.y += hoverY;
 
-    // Smooth opacity and pulsating emissive glow
+    // Subtle physical banking tilt when moving horizontally
+    const vx = targetPos.x - currentPos.current.x;
+    groupRef.current.rotation.z = -vx * 0.07;
+    groupRef.current.rotation.x = Math.sin(_state.clock.elapsedTime * 1.8 + floatOffset.current) * 0.012;
+
+    // Smooth opacity, color transition, and pulsating emissive glow
     if (matRef.current) {
       matRef.current.opacity = currentOpacity.current;
+      matRef.current.color.lerp(boxColor, lerpRate);
+
       if (obj.glow) {
         const pulse = 0.55 + 0.45 * Math.sin(_state.clock.elapsedTime * 3.2);
         matRef.current.emissiveIntensity = pulse;
@@ -249,6 +265,11 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
           matRef.current.emissiveIntensity = 0;
         }
       }
+    }
+
+    // Synchronized opacity on the front label plane
+    if (labelMatRef.current) {
+      labelMatRef.current.opacity = currentOpacity.current;
     }
   });
 
@@ -306,6 +327,7 @@ function SceneBox({ obj, reducedMotion }: SceneBoxProps) {
         <mesh position={[0, 0, 0.113]}>
           <planeGeometry args={[1.36, 0.72]} />
           <meshBasicMaterial
+            ref={labelMatRef}
             map={texture}
             transparent
             opacity={targetOpacity}
@@ -330,15 +352,15 @@ function SceneContent({ step, reducedMotion }: SceneContentProps) {
   return (
     <>
       {/* Studio Lighting */}
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[6, 8, 6]} intensity={1.3} castShadow />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={[6, 9, 6]} intensity={1.35} castShadow />
       <directionalLight position={[-6, 4, 3]} intensity={0.45} color="#FAF4ED" />
-      <directionalLight position={[0, 5, -6]} intensity={0.6} color="#FFFFFF" />
+      <directionalLight position={[0, 6, -6]} intensity={0.65} color="#FFFFFF" />
 
       {/* Soft Contact Shadows on Ground */}
       <ContactShadows
         position={[0, -2.15, 0]}
-        opacity={0.42}
+        opacity={0.45}
         scale={14}
         blur={2.4}
         far={4.5}
@@ -358,6 +380,7 @@ function SceneContent({ step, reducedMotion }: SceneContentProps) {
 
       {/* Controlled Camera Orbit */}
       <OrbitControls
+        target={[0, -0.15, 0]}
         enablePan={false}
         maxPolarAngle={Math.PI * 0.72}
         minPolarAngle={Math.PI * 0.22}
@@ -386,7 +409,7 @@ export default function OperatorSceneCanvas({
   return (
     <div className="w-full h-full relative select-none">
       <Canvas
-        camera={{ position: [0, 0.3, 7.6], fov: 38 }}
+        camera={{ position: [0, 0.25, 7.8], fov: 38 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
         style={{ width: "100%", height: "100%", background: "#FAF5EE" }}
