@@ -73,17 +73,9 @@ function shuffleOptions(questions: QuizQuestion[]): PreparedQuestion[] {
   });
 }
 
-function isSnippet(text: string): boolean {
-  return (
-    text.includes("(") ||
-    text.includes(")") ||
-    text.includes("=") ||
-    text.includes('"') ||
-    text.includes("'") ||
-    text.includes("[") ||
-    /^\d+$/.test(text) ||
-    /^[a-zA-Z_]\w*$/.test(text)
-  );
+function isCodeOption(text: string): boolean {
+  // Only detect actual Python statements/calls (e.g. print("Hi"), age = 25)
+  return (text.includes("(") && text.includes(")")) || /\w\s*=\s*/.test(text);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -645,7 +637,7 @@ export function ModuleQuiz({
           {currentItem.shuffledOptions.map((option, optIdx) => {
             const isSelected = selectedIndex === optIdx;
             const isCorrectOption = optIdx === currentItem.correctIndex;
-            const isSnippetOption = isSnippet(option);
+            const isCode = isCodeOption(option);
 
             let optionStyle =
               "bg-white border-[#E6DCC8] text-[#2B2521] hover:bg-[#FAF4ED] hover:border-[#D8CEBC]";
@@ -699,16 +691,16 @@ export function ModuleQuiz({
                     {optIdx + 1}
                   </span>
 
-                  {/* Option Text or Code Badge */}
-                  {isSnippetOption ? (
-                    <code className="font-mono text-xs sm:text-sm font-semibold px-2 py-0.5 rounded bg-[#1A1614] text-[#F3EFE6] border border-[#3E352F] truncate">
-                      {option}
-                    </code>
-                  ) : (
-                    <span className="text-xs sm:text-sm font-medium leading-relaxed truncate">
-                      {option}
-                    </span>
-                  )}
+                  {/* Option Text */}
+                  <span
+                    className={`text-xs sm:text-sm leading-relaxed ${
+                      isCode
+                        ? "font-mono font-semibold"
+                        : "font-medium"
+                    }`}
+                  >
+                    {option}
+                  </span>
                 </div>
 
                 {/* Post-Check Status Icon */}
