@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 
@@ -146,7 +146,26 @@ export function usePyodideRunner(): UsePyodideRunnerReturn {
         });
 
         // Run Python code
-        await pyodide.runPythonAsync(code);
+        const evalResult = await pyodide.runPythonAsync(code);
+
+        // If nothing was printed to stdout via print(), but the expression itself returned a value
+        // (common when learners write expressions e.g. 10 / 4, 17 % 5, 2 ** 10),
+        // capture that evaluated result as output so learners aren't penalized for omitting print().
+        if (stdoutChunks.length === 0 && evalResult !== undefined && evalResult !== null) {
+          const valStr = String(evalResult);
+          if (valStr !== "None" && valStr !== "[object Object]") {
+            stdoutChunks.push(valStr);
+          }
+        }
+
+        // Clean up PyProxy if evalResult is one
+        if (evalResult && typeof evalResult.destroy === "function") {
+          try {
+            evalResult.destroy();
+          } catch {
+            // Ignore if already destroyed
+          }
+        }
 
         const duration = Math.round(performance.now() - startTime);
         const result: PyodideRunResult = {

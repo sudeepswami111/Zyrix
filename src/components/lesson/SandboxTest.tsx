@@ -120,6 +120,14 @@ function grade(
   if (got === expected) {
     return { passed: true, message: question.passMessage };
   }
+
+  // Numeric equivalence fallback (e.g. "2" vs "2.0")
+  const gotNum = Number(got);
+  const expNum = Number(expected);
+  if (!Number.isNaN(gotNum) && !Number.isNaN(expNum) && gotNum === expNum && got.length > 0) {
+    return { passed: true, message: question.passMessage };
+  }
+
   return { passed: false, message: question.failMessage };
 }
 
@@ -611,19 +619,27 @@ export function SandboxTest({
   // ── Run (shows output, does not grade) ────────────────────────────────────
   const handleRun = useCallback(async () => {
     if (!isReady || isRunning) return;
-    const { stdout, error } = await safeRun(code);
+    let codeToRun = code;
+    if (question?.setupCode && !code.includes(question.setupCode.trim())) {
+      codeToRun = `${question.setupCode}\n${code}`;
+    }
+    const { stdout, error } = await safeRun(codeToRun);
     setRunStdout(stdout);
     setRunError(error);
     setHasRun(true);
     // Clear any previous grade when the user re-runs
     setGradeResult(null);
     setCanAdvance(false);
-  }, [isReady, isRunning, safeRun, code]);
+  }, [isReady, isRunning, safeRun, code, question]);
 
   // ── Submit (runs + grades) ────────────────────────────────────────────────
   const handleSubmit = useCallback(async () => {
     if (!isReady || isRunning || !question) return;
-    const { stdout, error } = await safeRun(code);
+    let codeToRun = code;
+    if (question?.setupCode && !code.includes(question.setupCode.trim())) {
+      codeToRun = `${question.setupCode}\n${code}`;
+    }
+    const { stdout, error } = await safeRun(codeToRun);
     setRunStdout(stdout);
     setRunError(error);
     setHasRun(true);

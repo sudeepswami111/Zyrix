@@ -37,6 +37,10 @@ export interface TestQuestion {
    * Optional custom fail message resolver (e.g. specific check on stdout or code)
    */
   customFailMessage?: (stdout: string, code: string) => string | null;
+  /**
+   * Optional setup code prepended when running if absent from user's editor
+   */
+  setupCode?: string;
 }
 
 export const episode1TestQuestions: TestQuestion[] = [
