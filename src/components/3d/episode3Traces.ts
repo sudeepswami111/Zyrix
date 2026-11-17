@@ -4,8 +4,16 @@
  * Each generator is a pure function that accepts the current inputs and returns
  * a TraceConfig. The 3D renderer has no knowledge of these functions.
  *
- * Stable actor IDs are preserved across steps to guarantee continuous,
- * buttery-smooth 3D spring animations without jarring pop-ins or collisions.
+ * All Y positions are designed so that the OperatorScene remapPosition()
+ * function keeps everything above the floor. The scene remaps Y linearly:
+ *   newY = y * 0.6 + 0.55, clamped above FLOOR_Y + 0.25
+ *
+ * Key vertical guide (raw → remapped):
+ *   y = 1.4  →  1.39   (high, label rows)
+ *   y = 0.6  →  0.91   (main row)
+ *   y = 0.0  →  0.55   (mid)
+ *   y = -0.6 →  0.19   (lower)
+ *   y = -1.0 → -0.05   (bottom, but still above floor at -1.6)
  */
 
 import type { TraceConfig, TraceObject, TraceStep } from "./trace";
@@ -72,11 +80,10 @@ export function buildArithmeticTrace(inputs: ArithInputs): TraceConfig {
   steps.push({
     index: idx++,
     objects: [
-      { id: "a", kind: "box", label: "a", value: a, position: [-2.1, 0.45, 0], scale: 1.05, color: "cream", opacity: 1, glow: true },
-      { id: "machine", kind: "box", label: op, position: [0, 0.45, 0], scale: 0.95, color: "dim", opacity: 0.35 },
-      { id: "b", kind: "box", label: "b", value: b, position: [2.1, 0.45, 0], scale: 0.95, color: "cream", opacity: 0.25 },
-      { id: "result", kind: "box", label: "result", value: "?", position: [0, -1.1, -0.3], scale: 0.8, opacity: 0.15, color: "dim" },
-      { id: "output", kind: "box", label: "CONSOLE", value: "?", position: [0, -1.1, -0.6], scale: 0.5, opacity: 0, color: "highlight" },
+      { id: "a", kind: "box", label: "a", value: a, position: [-2.0, 0.6, 0], scale: 1.05, color: "cream", opacity: 1, glow: true },
+      { id: "machine", kind: "box", label: op, position: [0, 0.6, 0], scale: 0.9, color: "dim", opacity: 0.3 },
+      { id: "b", kind: "box", label: "b", value: b, position: [2.0, 0.6, 0], scale: 0.9, color: "cream", opacity: 0.2 },
+      { id: "result", kind: "box", label: "result", value: "?", position: [0, -0.5, 0], scale: 0.75, opacity: 0.12, color: "dim" },
     ],
     codeLineIndex: 0,
     caption: `a is set to ${a}. It's the first value going into the operator.`,
@@ -87,11 +94,10 @@ export function buildArithmeticTrace(inputs: ArithInputs): TraceConfig {
   steps.push({
     index: idx++,
     objects: [
-      { id: "a", kind: "box", label: "a", value: a, position: [-2.1, 0.45, 0], scale: 1.0, color: "cream", opacity: 0.85, glow: false },
-      { id: "machine", kind: "box", label: op, position: [0, 0.45, 0], scale: 0.95, color: "dim", opacity: 0.45 },
-      { id: "b", kind: "box", label: "b", value: b, position: [2.1, 0.45, 0], scale: 1.05, color: "cream", opacity: 1, glow: true },
-      { id: "result", kind: "box", label: "result", value: "?", position: [0, -1.1, -0.3], scale: 0.8, opacity: 0.15, color: "dim" },
-      { id: "output", kind: "box", label: "CONSOLE", value: "?", position: [0, -1.1, -0.6], scale: 0.5, opacity: 0, color: "highlight" },
+      { id: "a", kind: "box", label: "a", value: a, position: [-2.0, 0.6, 0], scale: 1.0, color: "cream", opacity: 0.8, glow: false },
+      { id: "machine", kind: "box", label: op, position: [0, 0.6, 0], scale: 0.9, color: "dim", opacity: 0.4 },
+      { id: "b", kind: "box", label: "b", value: b, position: [2.0, 0.6, 0], scale: 1.05, color: "cream", opacity: 1, glow: true },
+      { id: "result", kind: "box", label: "result", value: "?", position: [0, -0.5, 0], scale: 0.75, opacity: 0.12, color: "dim" },
     ],
     codeLineIndex: 1,
     caption: `b is set to ${b}. Both values are ready to enter the machine.`,
@@ -102,18 +108,15 @@ export function buildArithmeticTrace(inputs: ArithInputs): TraceConfig {
   steps.push({
     index: idx++,
     objects: [
-      // a and b slide smoothly into the machine's rear intake ports
-      { id: "a", kind: "box", label: "a", value: a, position: [-0.95, 0.45, -0.28], scale: 0.65, color: "terracotta", opacity: 0.28 },
-      // Machine scales up heroically and pulses in terracotta with hero glyph
-      { id: "machine", kind: "box", label: op, position: [0, 0.45, 0.05], scale: 1.18, color: "terracotta", opacity: 1, glow: true, highlight: true },
-      { id: "b", kind: "box", label: "b", value: b, position: [0.95, 0.45, -0.28], scale: 0.65, color: "terracotta", opacity: 0.28 },
-      { id: "result", kind: "box", label: "result", value: "?", position: [0, -1.1, -0.2], scale: 0.88, opacity: 0.3, color: "dim" },
-      { id: "output", kind: "box", label: "CONSOLE", value: "?", position: [0, -1.1, -0.6], scale: 0.5, opacity: 0, color: "highlight" },
+      { id: "a", kind: "box", label: "a", value: a, position: [-0.85, 0.6, -0.2], scale: 0.6, color: "terracotta", opacity: 0.25 },
+      { id: "machine", kind: "box", label: op, position: [0, 0.6, 0.05], scale: 1.2, color: "terracotta", opacity: 1, glow: true, highlight: true },
+      { id: "b", kind: "box", label: "b", value: b, position: [0.85, 0.6, -0.2], scale: 0.6, color: "terracotta", opacity: 0.25 },
+      { id: "result", kind: "box", label: "result", value: "?", position: [0, -0.5, 0], scale: 0.85, opacity: 0.25, color: "dim" },
     ],
     codeLineIndex: 2,
     caption: divByZero
       ? `You can't divide by zero — Python raises a ZeroDivisionError.`
-      : `${a} ${op} ${b} → the operator machine processes both values…`,
+      : `${a} ${op} ${b} → the machine is calculating…`,
     operatorBadge: op,
   });
 
@@ -122,11 +125,10 @@ export function buildArithmeticTrace(inputs: ArithInputs): TraceConfig {
     steps.push({
       index: idx++,
       objects: [
-        { id: "a", kind: "box", label: "a", value: a, position: [-2.1, 0.45, -0.25], scale: 0.82, color: "cream", opacity: 0.35 },
-        { id: "machine", kind: "box", label: "⚠ ZeroDiv", position: [0, 0.45, 0], scale: 1.12, color: "highlight", opacity: 1, glow: true },
-        { id: "b", kind: "box", label: "b", value: b, position: [2.1, 0.45, -0.25], scale: 0.82, color: "cream", opacity: 0.35 },
-        { id: "result", kind: "box", label: "Error", value: "Div by zero", position: [0, -1.1, 0.05], scale: 1.1, color: "highlight", opacity: 1, glow: true },
-        { id: "output", kind: "box", label: "CONSOLE", value: "?", position: [0, -1.1, -0.6], scale: 0.5, opacity: 0, color: "highlight" },
+        { id: "a", kind: "box", label: "a", value: a, position: [-2.0, 0.6, -0.2], scale: 0.8, color: "cream", opacity: 0.3 },
+        { id: "machine", kind: "box", label: "⚠ ZeroDiv", position: [0, 0.6, 0], scale: 1.1, color: "highlight", opacity: 1, glow: true },
+        { id: "b", kind: "box", label: "b", value: b, position: [2.0, 0.6, -0.2], scale: 0.8, color: "cream", opacity: 0.3 },
+        { id: "result", kind: "box", label: "Error", value: "Div by zero", position: [0, -0.5, 0.05], scale: 1.1, color: "highlight", opacity: 1, glow: true },
       ],
       codeLineIndex: 2,
       caption: `Python raises ZeroDivisionError: division by zero is undefined. Change b to a non-zero value.`,
@@ -137,11 +139,10 @@ export function buildArithmeticTrace(inputs: ArithInputs): TraceConfig {
     steps.push({
       index: idx++,
       objects: [
-        { id: "a", kind: "box", label: "a", value: a, position: [-2.1, 0.45, -0.25], scale: 0.85, color: "cream", opacity: 0.45 },
-        { id: "machine", kind: "box", label: op, position: [0, 0.45, 0], scale: 1.0, color: "terracotta", opacity: 0.65 },
-        { id: "b", kind: "box", label: "b", value: b, position: [2.1, 0.45, -0.25], scale: 0.85, color: "cream", opacity: 0.45 },
-        { id: "result", kind: "box", label: "result", value: formatNum(r), position: [0, -1.1, 0.05], scale: 1.12, color: "terracotta", opacity: 1, glow: true, highlight: true },
-        { id: "output", kind: "box", label: "CONSOLE", value: formatNum(r), position: [0, -1.1, -0.5], scale: 0.6, opacity: 0, color: "highlight" },
+        { id: "a", kind: "box", label: "a", value: a, position: [-2.0, 0.6, -0.2], scale: 0.8, color: "cream", opacity: 0.4 },
+        { id: "machine", kind: "box", label: op, position: [0, 0.6, 0], scale: 0.95, color: "terracotta", opacity: 0.55 },
+        { id: "b", kind: "box", label: "b", value: b, position: [2.0, 0.6, -0.2], scale: 0.8, color: "cream", opacity: 0.4 },
+        { id: "result", kind: "box", label: "result", value: formatNum(r), position: [0, -0.5, 0.05], scale: 1.12, color: "terracotta", opacity: 1, glow: true, highlight: true },
       ],
       codeLineIndex: 2,
       caption: `${a} ${op} ${b} = ${formatNum(r)}. The result box emerges with the computed value.`,
@@ -152,11 +153,11 @@ export function buildArithmeticTrace(inputs: ArithInputs): TraceConfig {
     steps.push({
       index: idx++,
       objects: [
-        { id: "a", kind: "box", label: "a", value: a, position: [-2.1, 0.45, -0.4], scale: 0.75, color: "cream", opacity: 0.25 },
-        { id: "machine", kind: "box", label: op, position: [0, 0.45, 0], scale: 0.88, color: "dim", opacity: 0.3 },
-        { id: "b", kind: "box", label: "b", value: b, position: [2.1, 0.45, -0.4], scale: 0.75, color: "cream", opacity: 0.25 },
-        { id: "result", kind: "box", label: "result", value: formatNum(r), position: [0, -0.85, 0], scale: 0.98, color: "terracotta", opacity: 0.85 },
-        { id: "output", kind: "box", label: "CONSOLE", value: formatNum(r), position: [0, -1.95, 0.05], scale: 1.12, color: "highlight", opacity: 1, glow: true },
+        { id: "a", kind: "box", label: "a", value: a, position: [-2.0, 0.6, -0.3], scale: 0.7, color: "cream", opacity: 0.2 },
+        { id: "machine", kind: "box", label: op, position: [0, 0.6, 0], scale: 0.85, color: "dim", opacity: 0.25 },
+        { id: "b", kind: "box", label: "b", value: b, position: [2.0, 0.6, -0.3], scale: 0.7, color: "cream", opacity: 0.2 },
+        { id: "result", kind: "box", label: "result", value: formatNum(r), position: [-0.8, -0.3, 0], scale: 0.9, color: "terracotta", opacity: 0.75 },
+        { id: "output", kind: "box", label: "CONSOLE", value: formatNum(r), position: [0.8, -0.3, 0.05], scale: 1.05, color: "highlight", opacity: 1, glow: true },
       ],
       codeLineIndex: 3,
       caption: `print(result) outputs ${formatNum(r)} to the screen.`,
@@ -198,7 +199,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
       const c = i % cols;
       const r = Math.floor(i / cols);
       const x = (c - (cols - 1) / 2) * 0.46;
-      const y = 0.95 - r * 0.44;
+      const y = 1.1 - r * 0.44;
       objs.push({
         id: `block-${i}`,
         kind: "block",
@@ -212,7 +213,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
     return objs;
   }
 
-  // Adaptive grouping: handles any combination of n and k without clipping or off-screen overflow
+  // Adaptive grouping
   function makeGroupedBlocks(highlightFull: boolean, highlightRem: boolean): TraceObject[] {
     const objs: TraceObject[] = [];
 
@@ -226,7 +227,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
 
       const groupSpacing = Math.min(1.25, 4.8 / Math.max(countInThisRow, 1));
       const groupCenterX = (colInRow - (countInThisRow - 1) / 2) * groupSpacing;
-      const groupBaseY = twoRows ? (rowIndex === 0 ? 1.05 : 0.22) : 0.75;
+      const groupBaseY = twoRows ? (rowIndex === 0 ? 1.2 : 0.4) : 0.9;
 
       const itemsPerRow = k > 4 ? 3 : 2;
       for (let item = 0; item < k; item++) {
@@ -251,7 +252,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
     }
 
     // Remainder blocks
-    const remBaseY = twoRows ? -0.55 : -0.32;
+    const remBaseY = twoRows ? -0.3 : -0.1;
     for (let r = 0; r < rem; r++) {
       const blockIdx = full * k + r;
       if (blockIdx >= totalBlocks) break;
@@ -284,7 +285,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `// (Floor Division)`,
         value: `${full} full groups`,
-        position: [0, -1.45, -0.5],
+        position: [-1.5, -0.8, 0],
         scale: 0.6,
         color: "terracotta",
         opacity: 0,
@@ -294,7 +295,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `% (Modulo Remainder)`,
         value: rem === 0 ? "0 remainder" : `${rem} leftover`,
-        position: [1.5, -1.45, -0.5],
+        position: [1.5, -0.8, 0],
         scale: 0.6,
         color: "highlight",
         opacity: 0,
@@ -304,7 +305,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
     caption: `n = ${n}. Here are ${n} items ready to be sorted into groups of ${k}.`,
   });
 
-  // Step 1 — group them into groups of k
+  // Step 1 — group them
   steps.push({
     index: idx++,
     objects: [
@@ -314,8 +315,8 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `// (Floor Division)`,
         value: `${full} full groups`,
-        position: [0, -1.45, -0.4],
-        scale: 0.75,
+        position: [-1.5, -0.8, 0],
+        scale: 0.7,
         color: "terracotta",
         opacity: 0.15,
       },
@@ -324,8 +325,8 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `% (Modulo Remainder)`,
         value: rem === 0 ? "0 remainder" : `${rem} leftover`,
-        position: [1.5, -1.45, -0.4],
-        scale: 0.75,
+        position: [1.5, -0.8, 0],
+        scale: 0.7,
         color: "highlight",
         opacity: 0.15,
       },
@@ -334,7 +335,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
     caption: `Sorting into groups of ${k}: ${full} full group${full !== 1 ? "s" : ""}${rem > 0 ? ` and ${rem} leftover` : ""}.`,
   });
 
-  // Step 2 — highlight full groups (n // k)
+  // Step 2 — highlight full groups
   steps.push({
     index: idx++,
     objects: [
@@ -344,8 +345,8 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `// (Floor Division)`,
         value: `${full} full groups`,
-        position: [0, -1.45, 0.05],
-        scale: 1.1,
+        position: [-1.3, -0.8, 0.05],
+        scale: 1.0,
         color: "terracotta",
         opacity: 1,
         glow: true,
@@ -355,8 +356,8 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `% (Modulo Remainder)`,
         value: rem === 0 ? "0 remainder" : `${rem} leftover`,
-        position: [1.5, -1.45, -0.2],
-        scale: 0.85,
+        position: [1.3, -0.8, 0],
+        scale: 0.75,
         color: "dim",
         opacity: 0.3,
       },
@@ -366,7 +367,7 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
     operatorBadge: "//",
   });
 
-  // Step 3 — highlight remainder (n % k)
+  // Step 3 — highlight remainder
   steps.push({
     index: idx++,
     objects: [
@@ -376,18 +377,18 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
         kind: "box",
         label: `// (Floor Division)`,
         value: `${full} groups`,
-        position: [-1.5, -1.45, 0],
-        scale: 0.95,
+        position: [-1.3, -0.8, 0],
+        scale: 0.85,
         color: "dim",
-        opacity: 0.5,
+        opacity: 0.4,
       },
       {
         id: "rem-label",
         kind: "box",
         label: `% (Modulo Remainder)`,
         value: rem === 0 ? "0 remainder" : `${rem} leftover`,
-        position: [1.5, -1.45, 0.05],
-        scale: 1.1,
+        position: [1.3, -0.8, 0.05],
+        scale: 1.0,
         color: "highlight",
         opacity: 1,
         glow: true,
@@ -410,13 +411,13 @@ export function buildDivideTrace(inputs: DivideInputs): TraceConfig {
 export interface AssignInputs {
   op: AssignOp;
   amount: number; // 1-10
-  history: number[]; // last few values (maintained externally)
+  history: number[]; // last few values
 }
 
 export function buildAssignTrace(inputs: AssignInputs): TraceConfig {
   const { op, amount, history } = inputs;
   const startValue = history[history.length - 1] ?? 90;
-  const plainOp = op[0] as "+" | "-" | "*" | "/"; // strip "="
+  const plainOp = op[0] as "+" | "-" | "*" | "/";
   const rawResult = applyArith(startValue, amount, plainOp as ArithOp);
   const result = rawResult === null ? null : rawResult;
 
@@ -435,10 +436,10 @@ export function buildAssignTrace(inputs: AssignInputs): TraceConfig {
   steps.push({
     index: idx++,
     objects: [
-      { id: "score", kind: "box", label: "score", value: startValue, position: [0, 0.45, 0], scale: 1.08, color: "cream", opacity: 1, glow: false },
-      { id: "amount", kind: "box", label: "amount", value: amount, position: [1.9, 0.45, -0.4], scale: 0.6, color: "sand", opacity: 0 },
-      { id: "op_machine", kind: "box", label: "shorthand", value: `${op} ${amount}`, position: [0, -0.85, -0.3], scale: 0.6, color: "sand", opacity: 0 },
-      { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.45, -0.5], scale: 0.5, color: "dim", opacity: 0 },
+      { id: "score", kind: "box", label: "score", value: startValue, position: [0, 0.6, 0], scale: 1.08, color: "cream", opacity: 1, glow: false },
+      { id: "amount", kind: "box", label: "amount", value: amount, position: [1.9, 0.6, -0.3], scale: 0.6, color: "sand", opacity: 0 },
+      { id: "op_machine", kind: "box", label: "shorthand", value: `${op} ${amount}`, position: [0, -0.4, 0], scale: 0.6, color: "sand", opacity: 0 },
+      { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.6, -0.4], scale: 0.5, color: "dim", opacity: 0 },
     ],
     codeLineIndex: 0,
     caption: `score currently holds ${startValue} in memory.`,
@@ -448,10 +449,10 @@ export function buildAssignTrace(inputs: AssignInputs): TraceConfig {
   steps.push({
     index: idx++,
     objects: [
-      { id: "score", kind: "box", label: "score", value: startValue, position: [0, 0.45, 0], scale: 1.12, color: "terracotta", opacity: 1, glow: true },
-      { id: "amount", kind: "box", label: "amount", value: amount, position: [1.9, 0.45, -0.3], scale: 0.6, color: "sand", opacity: 0 },
-      { id: "op_machine", kind: "box", label: "shorthand", value: `${op} ${amount}`, position: [0, -0.85, 0.05], scale: 1.02, color: "sand", opacity: 1, glow: true },
-      { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.45, -0.5], scale: 0.5, color: "dim", opacity: 0 },
+      { id: "score", kind: "box", label: "score", value: startValue, position: [0, 0.6, 0], scale: 1.12, color: "terracotta", opacity: 1, glow: true },
+      { id: "amount", kind: "box", label: "amount", value: amount, position: [1.9, 0.6, -0.2], scale: 0.6, color: "sand", opacity: 0 },
+      { id: "op_machine", kind: "box", label: "shorthand", value: `${op} ${amount}`, position: [0, -0.4, 0.05], scale: 1.0, color: "sand", opacity: 1, glow: true },
+      { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.6, -0.4], scale: 0.5, color: "dim", opacity: 0 },
     ],
     codeLineIndex: 1,
     caption: `score ${op} ${amount} is shorthand — Python expands it to score = score ${plainOp} ${amount}.`,
@@ -462,10 +463,10 @@ export function buildAssignTrace(inputs: AssignInputs): TraceConfig {
   steps.push({
     index: idx++,
     objects: [
-      { id: "score", kind: "box", label: "score (current)", value: startValue, position: [-1.9, 0.45, 0], scale: 0.95, color: "cream", opacity: 0.85 },
-      { id: "op_machine", kind: "box", label: plainOp, position: [0, 0.45, 0], scale: 1.15, color: "terracotta", opacity: 1, glow: true },
-      { id: "amount", kind: "box", label: "amount", value: amount, position: [1.9, 0.45, 0], scale: 0.95, color: "sand", opacity: 1 },
-      { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.45, -0.5], scale: 0.5, color: "dim", opacity: 0 },
+      { id: "score", kind: "box", label: "score (current)", value: startValue, position: [-1.8, 0.6, 0], scale: 0.95, color: "cream", opacity: 0.85 },
+      { id: "op_machine", kind: "box", label: plainOp, position: [0, 0.6, 0], scale: 1.15, color: "terracotta", opacity: 1, glow: true },
+      { id: "amount", kind: "box", label: "amount", value: amount, position: [1.8, 0.6, 0], scale: 0.95, color: "sand", opacity: 1 },
+      { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.6, -0.4], scale: 0.5, color: "dim", opacity: 0 },
     ],
     codeLineIndex: 2,
     caption: `Expanded: score = ${startValue} ${plainOp} ${amount}. Python evaluates the right side first.`,
@@ -477,10 +478,10 @@ export function buildAssignTrace(inputs: AssignInputs): TraceConfig {
     steps.push({
       index: idx++,
       objects: [
-        { id: "score", kind: "box", label: "score", value: "ZeroDivision", position: [0, 0.45, 0.05], scale: 1.18, color: "highlight", opacity: 1, glow: true },
-        { id: "op_machine", kind: "box", label: plainOp, position: [0, 0.45, -0.4], scale: 0.6, color: "terracotta", opacity: 0 },
-        { id: "amount", kind: "box", label: "amount", value: amount, position: [0, 0.45, -0.4], scale: 0.6, color: "sand", opacity: 0 },
-        { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.45, -0.5], scale: 0.5, color: "dim", opacity: 0 },
+        { id: "score", kind: "box", label: "score", value: "ZeroDivision", position: [0, 0.6, 0.05], scale: 1.18, color: "highlight", opacity: 1, glow: true },
+        { id: "op_machine", kind: "box", label: plainOp, position: [0, 0.6, -0.3], scale: 0.6, color: "terracotta", opacity: 0 },
+        { id: "amount", kind: "box", label: "amount", value: amount, position: [0, 0.6, -0.3], scale: 0.6, color: "sand", opacity: 0 },
+        { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 0.6, -0.4], scale: 0.5, color: "dim", opacity: 0 },
       ],
       codeLineIndex: 3,
       caption: `ZeroDivisionError: you can't divide by zero. Change amount to a non-zero value.`,
@@ -490,10 +491,10 @@ export function buildAssignTrace(inputs: AssignInputs): TraceConfig {
     steps.push({
       index: idx++,
       objects: [
-        { id: "score", kind: "box", label: "score", value: formatNum(result), position: [0, 0.45, 0.05], scale: 1.18, color: "terracotta", opacity: 1, glow: true, highlight: true },
-        { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 1.45, -0.3], scale: 0.75, color: "dim", opacity: 0.35 },
-        { id: "op_machine", kind: "box", label: plainOp, position: [0, 0.45, -0.4], scale: 0.6, color: "terracotta", opacity: 0 },
-        { id: "amount", kind: "box", label: "amount", value: amount, position: [0, 0.45, -0.4], scale: 0.6, color: "sand", opacity: 0 },
+        { id: "score", kind: "box", label: "score", value: formatNum(result), position: [0, 0.6, 0.05], scale: 1.18, color: "terracotta", opacity: 1, glow: true, highlight: true },
+        { id: "old_ghost", kind: "box", label: "previous", value: startValue, position: [0, 1.5, -0.2], scale: 0.7, color: "dim", opacity: 0.3 },
+        { id: "op_machine", kind: "box", label: plainOp, position: [0, 0.6, -0.3], scale: 0.6, color: "terracotta", opacity: 0 },
+        { id: "amount", kind: "box", label: "amount", value: amount, position: [0, 0.6, -0.3], scale: 0.6, color: "sand", opacity: 0 },
       ],
       codeLineIndex: 3,
       caption: isDecimal
