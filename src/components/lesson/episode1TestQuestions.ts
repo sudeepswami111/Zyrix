@@ -38,6 +38,10 @@ export interface TestQuestion {
    */
   customFailMessage?: (stdout: string, code: string) => string | null;
   /**
+   * Optional custom error message resolver when execution produces an error (e.g. SyntaxError)
+   */
+  customErrorMessage?: (error: string, code: string) => string | null;
+  /**
    * Optional setup code prepended when running if absent from user's editor
    */
   setupCode?: string;

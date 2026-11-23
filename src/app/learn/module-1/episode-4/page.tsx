@@ -10,6 +10,7 @@ import {
   Layers,
   Compass,
   Box,
+  Terminal,
 } from "lucide-react";
 import { PageBackground } from "@/components/PageBackground";
 import { Navbar } from "@/components/Navbar";
@@ -19,11 +20,24 @@ import { NarratedVideoStage } from "@/components/lesson/NarratedVideoStage";
 import { episode4StoryScenes } from "@/components/lesson/episode4StoryScenes";
 import { ComingSoonCard } from "@/components/lesson/ComingSoonCard";
 import { VideoPreview } from "@/components/formats/previews/VideoPreview";
-import { DebugPreview } from "@/components/formats/previews/DebugPreview";
+import { SandboxPreview } from "@/components/lesson/previews/SandboxPreview";
+import { SandboxTest } from "@/components/lesson/SandboxTest";
+import { episode4TestQuestions } from "@/components/lesson/episode4TestQuestions";
 import { Viz3DPreview } from "@/components/formats/previews/Viz3DPreview";
+
+type SandboxMode = "practice" | "test";
+
+const PRACTICE_STARTER_CODE = `age = 18
+has_ticket = True
+banned = False
+print(age >= 18)
+print(age >= 18 and has_ticket)
+print(age >= 18 and has_ticket and not banned)
+`;
 
 export default function Episode4Page() {
   const [activeTab, setActiveTab] = useState<LessonTabId>("story");
+  const [sandboxMode, setSandboxMode] = useState<SandboxMode>("practice");
 
   const extraTabs: TabConfig[] = [
     {
@@ -107,10 +121,10 @@ export default function Episode4Page() {
                   "Follow Asha at the coding event entry gate across 10 scenes teaching comparison and logical operators",
               },
               sandbox: {
-                badge: "Coming soon",
+                badge: undefined,
                 isAvailable: true,
                 description:
-                  "Interactive in-browser Pyodide code environment to experiment with comparison and logical operators",
+                  "Interactive in-browser Pyodide code environment to experiment with comparison and logical operators live",
               },
               "3d": {
                 badge: "Coming soon",
@@ -150,15 +164,133 @@ export default function Episode4Page() {
             />
           )}
 
-          {/* Sandbox Tab — Coming Soon Card */}
+          {/* Sandbox Tab — Practice / Test Modes */}
           {activeTab === "sandbox" && (
-            <ComingSoonCard
-              title="Interactive Gatekeeper Sandbox"
-              formatName="Python 3.12 (Wasm) Playground"
-              description="Interactive in-browser code environment with guided practice and test challenges for comparison and logical operators."
-              preview={<DebugPreview />}
-              roadmapNote="Coding sandbox and test challenges coming soon for Episode 4"
-            />
+            <div className="w-full rounded-2xl bg-white border border-[#E6DCC8] shadow-xs overflow-hidden">
+              {/* Header Bar */}
+              <div className="p-4 sm:p-5 border-b border-[#E6DCC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF4ED]/40">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#C1502E] animate-pulse" />
+                  <span className="font-mono text-xs font-semibold text-[#2B2521]">
+                    Interactive Python Sandbox
+                  </span>
+                  <span className="text-[#A89F91]">•</span>
+                  <span className="text-xs font-mono text-[#6B6058]">
+                    Python 3.12 (Wasm)
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1E2CF] text-[#8C3A20] text-xs font-mono font-medium">
+                    <Terminal className="w-3.5 h-3.5 text-[#C1502E]" />
+                    <span>Live Playground</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Practice / Test mode switcher */}
+              <div className="px-4 sm:px-6 pt-5 pb-0 flex flex-wrap items-center justify-between gap-3">
+                {/* Segmented pill switch */}
+                <div
+                  role="tablist"
+                  aria-label="Sandbox mode"
+                  className="inline-flex items-center gap-1 p-1 rounded-xl bg-[#FAF4ED] border border-[#E6DCC8]"
+                >
+                  {(["practice", "test"] as SandboxMode[]).map((mode) => {
+                    const isActive = sandboxMode === mode;
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        onClick={() => setSandboxMode(mode)}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-1 capitalize ${
+                          isActive
+                            ? "bg-[#C1502E] text-white shadow-xs"
+                            : "text-[#6B6058] hover:text-[#2B2521] hover:bg-[#F1E2CF]"
+                        }`}
+                      >
+                        {mode}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Question count badge */}
+                {sandboxMode === "test" && (
+                  <span className="text-xs font-mono text-[#6B6058]">
+                    Episode 4 · {episode4TestQuestions.length} questions
+                  </span>
+                )}
+              </div>
+
+              {/* Main Content Area */}
+              <div className="p-6 sm:p-8 flex flex-col gap-6">
+                {sandboxMode === "practice" && (
+                  <>
+                    <div className="max-w-2xl">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
+                        <span>INTERACTIVE SANDBOX</span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
+                        Run Asha&apos;s Gate Check
+                      </h3>
+                      <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
+                        Check conditions, evaluate logic gates, and explore comparison and logical operators directly in your browser. Edit the code, hit Run, and watch real Python execute via in-browser WebAssembly.
+                      </p>
+                    </div>
+
+                    {/* Embedded Real Pyodide Sandbox Playground */}
+                    <div className="w-full rounded-xl border border-[#E6DCC8] bg-[#FAF4ED]/60 p-4 sm:p-6 overflow-hidden">
+                      <SandboxPreview
+                        initialCode={PRACTICE_STARTER_CODE}
+                        customTip={
+                          <p className="text-xs sm:text-sm text-[#6B6058] leading-relaxed">
+                            <strong className="text-[#2B2521] font-medium">Try it yourself:</strong>{" "}
+                            change age to 16 and Run again, set has_ticket to False, set banned to True, and try swapping <code className="font-mono text-[#C1502E] font-semibold">and</code> for <code className="font-mono text-[#C1502E] font-semibold">or</code>. Watch how each True or False changes.
+                          </p>
+                        }
+                      />
+                    </div>
+                  </>
+                )}
+
+                {sandboxMode === "test" && (
+                  <>
+                    <div className="max-w-2xl">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#C1502E] mb-2">
+                        <span>CODING TEST</span>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#2B2521] tracking-tight mb-2">
+                        Episode 4 Test
+                      </h3>
+                      <p className="text-sm sm:text-base text-[#6B6058] leading-relaxed font-sans">
+                        Six short coding questions based on what Episode 4 teaches. Write the code, hit Submit, and get instant feedback.
+                      </p>
+                    </div>
+
+                    <SandboxTest
+                      questions={episode4TestQuestions}
+                      episodeKey="module-1-episode-4"
+                      onBackToPractice={() => setSandboxMode("practice")}
+                    />
+                  </>
+                )}
+              </div>
+
+              {/* Footer Info */}
+              <div className="p-4 sm:p-5 bg-[#FAF4ED]/50 border-t border-[#E6DCC8] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#6B6058]">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#C1502E] shrink-0" />
+                  <span>Real Python 3.12 WebAssembly runtime • Zero server latency • Instant feedback</span>
+                </div>
+
+                <div className="flex items-center gap-2 text-[11px] font-mono text-[#8C7E72]">
+                  <span>Module 1: Episode 4 Multi-Format Track</span>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* 3D Tab — Coming Soon Card */}

@@ -78,6 +78,12 @@ function grade(
   code: string
 ): GradeResult {
   if (error) {
+    if (question.customErrorMessage) {
+      const custom = question.customErrorMessage(error, code);
+      if (custom) {
+        return { passed: false, message: custom };
+      }
+    }
     // Show the Python error in plain language
     const plain = error
       .replace(/PythonError:\s*/g, "")
