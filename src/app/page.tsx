@@ -1,35 +1,23 @@
 import React from "react";
-import { PageBackground } from "@/components/PageBackground";
-import { Navbar } from "@/components/Navbar";
+import type { Metadata } from "next";
 import { Hero } from "@/components/Hero";
-import { HowWeTeachSection } from "@/components/HowWeTeachSection";
-import { CurriculumSection } from "@/components/CurriculumSection";
-import { ShowcaseSection } from "@/components/ShowcaseSection";
-import { PricingSection } from "@/components/PricingSection";
+import { ExploreZyrixSection } from "@/components/ExploreZyrixSection";
 import { FinalCTA } from "@/components/FinalCTA";
-import { Footer } from "@/components/Footer";
+import { HashRedirect } from "@/components/HashRedirect";
+
+export const metadata: Metadata = {
+  title: "Zyrix — Every Concept, Taught the Way It Actually Makes Sense",
+  description:
+    "An editorial interactive learning platform for machine learning and data science. Live 3D visualizations, interactive simulations, and plain-language intuition.",
+};
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#FBF6EF] text-[#2B2521] selection:bg-[#F1E2CF] selection:text-[#C1502E]">
-      {/* Background layer */}
-      <PageBackground />
-
-      {/* Navigation bar */}
-      <Navbar />
-
-      {/* Main Content Area */}
-      <main className="flex-1">
-        <Hero />
-        <HowWeTeachSection />
-        <CurriculumSection />
-        <ShowcaseSection />
-        <PricingSection />
-        <FinalCTA />
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    <>
+      <HashRedirect />
+      <Hero />
+      <ExploreZyrixSection />
+      <FinalCTA />
+    </>
   );
 }

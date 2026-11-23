@@ -1,33 +1,31 @@
-﻿"use client";
+"use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, ArrowRight } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const navLinks = [
-    { label: "How We Teach", href: "#how-we-teach" },
-    { label: "Curriculum", href: "#curriculum" },
-    { label: "Showcase", href: "#showcase" },
-    { label: "Pricing", href: "#pricing" },
+    { label: "How We Teach", href: "/how-we-teach" },
+    { label: "Curriculum", href: "/curriculum" },
+    { label: "Showcase", href: "/showcase" },
+    { label: "Pricing", href: "/pricing" },
   ];
 
-  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith("#")) {
-      e.preventDefault();
-      const targetId = href.substring(1);
-      const elem = document.getElementById(targetId);
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      } else {
-        // Fallback for pages outside home
-        window.location.href = `/${href}`;
+  // Close mobile menu on Escape key for keyboard accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileMenuOpen) {
+        setMobileMenuOpen(false);
       }
-      setMobileMenuOpen(false);
-    }
-  };
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#FBF6EF]/95 backdrop-blur-sm border-b border-[#E6DCC8] transition-colors">
@@ -62,16 +60,23 @@ export function Navbar() {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8" aria-label="Main Navigation">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleSmoothScroll(e, link.href)}
-                className="text-sm font-medium text-[#6B6058] hover:text-[#2B2521] transition-colors relative py-1 rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-[#C1502E] hover:after:w-full after:transition-all after:duration-200"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`text-sm font-medium transition-colors relative py-1 rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-[#C1502E] after:transition-all after:duration-200 ${
+                    isActive
+                      ? "text-[#C1502E] font-semibold after:w-full"
+                      : "text-[#6B6058] hover:text-[#2B2521] after:w-0 hover:after:w-full"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* CTA Button -> Directly links to Module 1 Episode 1 */}
@@ -104,16 +109,24 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#FBF6EF] border-b border-[#E6DCC8] px-4 pt-3 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
           <nav className="flex flex-col space-y-2">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleSmoothScroll(e, link.href)}
-                className="px-3 py-2 rounded-lg text-base font-medium text-[#2B2521] hover:bg-[#F1E2CF] transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`px-3 py-2 rounded-lg text-base font-medium transition-colors ${
+                    isActive
+                      ? "bg-[#F1E2CF] text-[#C1502E] font-semibold"
+                      : "text-[#2B2521] hover:bg-[#F1E2CF]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
           <div className="pt-2 border-t border-[#E6DCC8]/60">
             <Link

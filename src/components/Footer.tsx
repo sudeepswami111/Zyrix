@@ -26,20 +26,6 @@ export function Footer() {
     () => "unsupported"
   );
 
-  const handleSmoothScroll = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    href: string
-  ) => {
-    if (href.startsWith("#")) {
-      e.preventDefault();
-      const targetId = href.substring(1);
-      const elem = document.getElementById(targetId);
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  };
-
   const currentYear = new Date().getFullYear();
 
   return (
@@ -83,19 +69,20 @@ export function Footer() {
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FAF4ED] border border-[#E6DCC8] text-xs font-mono text-[#6B6058]">
                 <span
-                  className={`w-2 h-2 rounded-full shrink-0 ${webglStatus === "supported"
+                  className={`w-2 h-2 rounded-full shrink-0 ${
+                    webglStatus === "supported"
                       ? "bg-[#16A34A]"
                       : webglStatus === "unsupported"
-                        ? "bg-[#D97706]"
-                        : "bg-[#8C7E72] animate-pulse"
-                    }`}
+                      ? "bg-[#D97706]"
+                      : "bg-[#8C7E72] animate-pulse"
+                  }`}
                 />
                 <span>
                   {webglStatus === "supported"
                     ? "WebGL 2.0 Acceleration Active"
                     : webglStatus === "unsupported"
-                      ? "WebGL 2.0 Unavailable (Fallback Mode)"
-                      : "Detecting Graphics Capabilities..."}
+                    ? "WebGL 2.0 Unavailable (Fallback Mode)"
+                    : "Detecting Graphics Capabilities..."}
                 </span>
               </div>
             </div>
@@ -108,40 +95,36 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm font-sans">
               <li>
-                <a
-                  href="#how-we-teach"
-                  onClick={(e) => handleSmoothScroll(e, "#how-we-teach")}
+                <Link
+                  href="/how-we-teach"
                   className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
                 >
                   How We Teach
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#curriculum"
-                  onClick={(e) => handleSmoothScroll(e, "#curriculum")}
+                <Link
+                  href="/curriculum"
                   className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
                 >
                   Curriculum
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#showcase"
-                  onClick={(e) => handleSmoothScroll(e, "#showcase")}
+                <Link
+                  href="/showcase"
                   className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
                 >
                   Format Showcase
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#pricing"
-                  onClick={(e) => handleSmoothScroll(e, "#pricing")}
+                <Link
+                  href="/pricing"
                   className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
                 >
                   Pricing
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

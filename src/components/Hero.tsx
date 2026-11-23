@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { ArrowRight, Compass, Box, Terminal, Laptop } from "lucide-react";
 import { GradientDescentDemo } from "./GradientDescentDemo";
 
@@ -83,14 +84,13 @@ export function Hero() {
               <ArrowRight className="w-4 h-4 ml-0.5" />
             </a>
 
-            <a
-              href="#how-we-teach"
-              onClick={(e) => handleSmoothScroll(e, "#how-we-teach")}
+            <Link
+              href="/how-we-teach"
               className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-base font-medium bg-[#FAF4ED] hover:bg-[#F1E2CF] text-[#2B2521] border border-[#E6DCC8] shadow-xs transition-all duration-200 active:scale-98 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2"
             >
               <Compass className="w-4 h-4 text-[#C1502E]" />
               <span>See How We Teach</span>
-            </a>
+            </Link>
           </div>
 
           {/* Truth-Only Stat Row */}

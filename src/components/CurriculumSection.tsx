@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { GraduationCap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { curriculumModules } from "@/lib/curriculumData";
@@ -91,13 +92,13 @@ export function CurriculumSection() {
               Test out the live gradient descent visualizer in the sandbox above.
             </p>
           </div>
-          <a
-            href="#sandbox"
+          <Link
+            href="/#sandbox"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold bg-[#C1502E] hover:bg-[#A84224] text-white shadow-xs transition-colors shrink-0"
           >
             <span>Jump to 3D Sandbox</span>
             <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

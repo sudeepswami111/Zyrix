@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
 import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
@@ -75,20 +76,20 @@ export function FinalCTA() {
 
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <a
-              href="#"
+            <Link
+              href="/learn/module-1/episode-1"
               className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#C1502E] hover:bg-[#A84224] text-white text-sm sm:text-base font-sans font-medium shadow-warm-md hover:shadow-warm-lg transition-all duration-200 cursor-pointer active:scale-98 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2"
             >
               <span>Start Module 1 Free</span>
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
 
-            <a
-              href="#curriculum"
+            <Link
+              href="/curriculum"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-[#FAF4ED] text-[#2B2521] border border-[#E6DCC8] text-sm sm:text-base font-sans font-medium shadow-xs transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2"
             >
               <span>Explore the Curriculum</span>
-            </a>
+            </Link>
           </div>
 
           {/* Reassurance Guarantee */}

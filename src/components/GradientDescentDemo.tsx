@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
   Play,
@@ -463,13 +464,13 @@ export function GradientDescentDemo() {
             This 3D interactive model is <strong>1 of 7 learning formats</strong> in Zyrix.
           </span>
         </div>
-        <a
-          href="#how-we-teach"
+        <Link
+          href="/how-we-teach"
           className="text-[#C1502E] hover:text-[#A84224] font-medium hover:underline flex items-center gap-1 transition-colors"
         >
           <span>See all 7 formats</span>
           <ArrowDownRight className="w-3.5 h-3.5" />
-        </a>
+        </Link>
       </div>
     </div>
   );
