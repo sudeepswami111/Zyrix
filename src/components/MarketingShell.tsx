@@ -7,22 +7,21 @@ import { Footer } from "@/components/Footer";
 import { AmbientBackground } from "@/components/AmbientBackground";
 
 function getInitialTheme(): "dark" | "light" {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return "light";
   try {
     const saved = localStorage.getItem("zyrix-marketing-theme");
     if (saved === "light" || saved === "dark") return saved;
-    if (window.matchMedia("(prefers-color-scheme: light)").matches) return "light";
   } catch {
     // Safe fallback if localStorage is unavailable
   }
-  return "dark";
+  return "light";
 }
 
 export function MarketingShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLessonRoute = pathname?.startsWith("/learn");
 
-  // Dark-first default palette with lazy initial state
+  // Premium warm light visual theme by default
   const [theme, setTheme] = useState<"dark" | "light">(getInitialTheme);
 
   const toggleTheme = () => {

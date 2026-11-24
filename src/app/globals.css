@@ -31,27 +31,32 @@
   --tint-warm: #F1E2CF;
   --border-warm: #E6DCC8;
 
-  /* Default marketing tokens fallback if used outside wrapper */
-  --zy-bg: #0B1020;
-  --zy-surface: #121A2E;
-  --zy-surface-2: #1A2440;
-  --zy-surface-elevated: #162038;
-  --zy-border: #26314F;
-  --zy-border-subtle: #1C2742;
-  --zy-border-focus: #FFB454;
-  --zy-text: #E9EEFB;
-  --zy-muted: #9AA7C7;
-  --zy-run: #35E0C2;
-  --zy-run-text: #35E0C2;
-  --zy-run-subtle: rgba(53, 224, 194, 0.12);
-  --zy-active: #FFB454;
-  --zy-active-text: #FFB454;
-  --zy-active-hover: #FFA230;
-  --zy-active-subtle: rgba(255, 180, 84, 0.14);
-  --zy-false: #FF6B81;
-  --zy-false-subtle: rgba(255, 107, 129, 0.14);
-  --zy-btn-text: #0B1020;
-  --zy-navbar-bg: rgba(11, 16, 32, 0.85);
+  /* Default marketing tokens: Warm Light Theme */
+  --zy-bg: #F8F7F3;
+  --zy-surface: #FFFFFF;
+  --zy-surface-2: #F1EFEA;
+  --zy-surface-elevated: #FFFFFF;
+  --zy-border: #E5E3DC;
+  --zy-border-subtle: #ECEAE4;
+  --zy-border-focus: #FFAA45;
+  --zy-text: #17191F;
+  --zy-muted: #777B85;
+  --zy-accent-orange: #FFAA45;
+  --zy-accent-orange-deep: #E68522;
+  --zy-accent-teal: #25B8A5;
+  --zy-accent-teal-subtle: rgba(37, 184, 165, 0.12);
+  --zy-accent-orange-subtle: rgba(255, 170, 69, 0.14);
+  --zy-run: #25B8A5;
+  --zy-run-text: #0E7568;
+  --zy-run-subtle: rgba(37, 184, 165, 0.12);
+  --zy-active: #FFAA45;
+  --zy-active-text: #B45E00;
+  --zy-active-hover: #F2982B;
+  --zy-active-subtle: rgba(255, 170, 69, 0.14);
+  --zy-false: #E04D62;
+  --zy-false-subtle: rgba(224, 77, 98, 0.12);
+  --zy-btn-text: #17191F;
+  --zy-navbar-bg: rgba(248, 247, 243, 0.85);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -59,28 +64,33 @@
    Lesson pages do not use this class and remain in classic cream/terracotta.
    ────────────────────────────────────────────────────────────────────────── */
 
-/* Dark (Default) Palette */
+/* Premium Light (Default) Palette */
 .zy-marketing {
-  --zy-bg: #0B1020;
-  --zy-surface: #121A2E;
-  --zy-surface-2: #1A2440;
-  --zy-surface-elevated: #162038;
-  --zy-border: #26314F;
-  --zy-border-subtle: #1C2742;
-  --zy-border-focus: #FFB454;
-  --zy-text: #E9EEFB;
-  --zy-muted: #9AA7C7;
-  --zy-run: #35E0C2;
-  --zy-run-text: #35E0C2;
-  --zy-run-subtle: rgba(53, 224, 194, 0.12);
-  --zy-active: #FFB454;
-  --zy-active-text: #FFB454;
-  --zy-active-hover: #FFA230;
-  --zy-active-subtle: rgba(255, 180, 84, 0.14);
-  --zy-false: #FF6B81;
-  --zy-false-subtle: rgba(255, 107, 129, 0.14);
-  --zy-btn-text: #0B1020;
-  --zy-navbar-bg: rgba(11, 16, 32, 0.85);
+  --zy-bg: #F8F7F3;
+  --zy-surface: #FFFFFF;
+  --zy-surface-2: #F1EFEA;
+  --zy-surface-elevated: #FFFFFF;
+  --zy-border: #E5E3DC;
+  --zy-border-subtle: #ECEAE4;
+  --zy-border-focus: #FFAA45;
+  --zy-text: #17191F;
+  --zy-muted: #777B85;
+  --zy-accent-orange: #FFAA45;
+  --zy-accent-orange-deep: #E68522;
+  --zy-accent-teal: #25B8A5;
+  --zy-accent-teal-subtle: rgba(37, 184, 165, 0.12);
+  --zy-accent-orange-subtle: rgba(255, 170, 69, 0.14);
+  --zy-run: #25B8A5;
+  --zy-run-text: #0E7568;
+  --zy-run-subtle: rgba(37, 184, 165, 0.12);
+  --zy-active: #FFAA45;
+  --zy-active-text: #B45E00;
+  --zy-active-hover: #F2982B;
+  --zy-active-subtle: rgba(255, 170, 69, 0.14);
+  --zy-false: #E04D62;
+  --zy-false-subtle: rgba(224, 77, 98, 0.12);
+  --zy-btn-text: #17191F;
+  --zy-navbar-bg: rgba(248, 247, 243, 0.88);
 
   /* Override classic tokens inside marketing scope */
   --cream-bg: var(--zy-bg);
@@ -93,66 +103,36 @@
   background-color: var(--zy-bg);
   color: var(--zy-text);
   font-family: var(--font-instrument), var(--font-sans), sans-serif;
-  color-scheme: dark;
-}
-
-/* Light Theme Variant */
-.zy-marketing[data-theme="light"] {
-  --zy-bg: #F4F6FB;
-  --zy-surface: #FFFFFF;
-  --zy-surface-2: #E9EDF7;
-  --zy-surface-elevated: #FFFFFF;
-  --zy-border: #D5DCEC;
-  --zy-border-subtle: #E2E8F4;
-  --zy-border-focus: #9A5A00;
-  --zy-text: #101728;
-  --zy-muted: #55607C;
-  --zy-run: #35E0C2;
-  --zy-run-text: #0B7F6E;
-  --zy-run-subtle: rgba(53, 224, 194, 0.18);
-  --zy-active: #FFB454;
-  --zy-active-text: #9A5A00;
-  --zy-active-hover: #E69500;
-  --zy-active-subtle: rgba(255, 180, 84, 0.22);
-  --zy-false: #C2364E;
-  --zy-false-subtle: rgba(194, 54, 78, 0.15);
-  --zy-btn-text: #101728;
-  --zy-navbar-bg: rgba(244, 246, 251, 0.90);
-
-  --cream-bg: var(--zy-bg);
-  --ink: var(--zy-text);
-  --ink-muted: var(--zy-muted);
-  --terracotta: var(--zy-active);
-  --tint-warm: var(--zy-surface-2);
-  --border-warm: var(--zy-border);
-
-  background-color: var(--zy-bg);
-  color: var(--zy-text);
   color-scheme: light;
 }
 
-/* Explicit Dark Override */
+/* Optional Dark Theme Variant */
 .zy-marketing[data-theme="dark"] {
-  --zy-bg: #0B1020;
-  --zy-surface: #121A2E;
-  --zy-surface-2: #1A2440;
-  --zy-surface-elevated: #162038;
-  --zy-border: #26314F;
-  --zy-border-subtle: #1C2742;
-  --zy-border-focus: #FFB454;
-  --zy-text: #E9EEFB;
-  --zy-muted: #9AA7C7;
-  --zy-run: #35E0C2;
+  --zy-bg: #0F1218;
+  --zy-surface: #171B24;
+  --zy-surface-2: #1E232F;
+  --zy-surface-elevated: #222836;
+  --zy-border: #2A3142;
+  --zy-border-subtle: #212634;
+  --zy-border-focus: #FFAA45;
+  --zy-text: #F3F4F7;
+  --zy-muted: #8E95A5;
+  --zy-accent-orange: #FFAA45;
+  --zy-accent-orange-deep: #FFAA45;
+  --zy-accent-teal: #25B8A5;
+  --zy-accent-teal-subtle: rgba(37, 184, 165, 0.16);
+  --zy-accent-orange-subtle: rgba(255, 170, 69, 0.16);
+  --zy-run: #25B8A5;
   --zy-run-text: #35E0C2;
-  --zy-run-subtle: rgba(53, 224, 194, 0.12);
-  --zy-active: #FFB454;
-  --zy-active-text: #FFB454;
-  --zy-active-hover: #FFA230;
-  --zy-active-subtle: rgba(255, 180, 84, 0.14);
+  --zy-run-subtle: rgba(37, 184, 165, 0.16);
+  --zy-active: #FFAA45;
+  --zy-active-text: #FFAA45;
+  --zy-active-hover: #FFB85C;
+  --zy-active-subtle: rgba(255, 170, 69, 0.16);
   --zy-false: #FF6B81;
-  --zy-false-subtle: rgba(255, 107, 129, 0.14);
-  --zy-btn-text: #0B1020;
-  --zy-navbar-bg: rgba(11, 16, 32, 0.85);
+  --zy-false-subtle: rgba(255, 107, 129, 0.16);
+  --zy-btn-text: #0F1218;
+  --zy-navbar-bg: rgba(15, 18, 24, 0.88);
 
   --cream-bg: var(--zy-bg);
   --ink: var(--zy-text);

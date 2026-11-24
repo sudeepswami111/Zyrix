@@ -48,12 +48,12 @@ export function AmbientBackground() {
         }}
       />
 
-      {/* Subtle radial glow following cursor on desktop fine pointer */}
+      {/* Subtle warm glow following cursor on desktop fine pointer */}
       {isFinePointer && !reducedMotion && coords && (
         <div
           className="absolute inset-0 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(650px circle at ${coords.x}px ${coords.y}px, rgba(53, 224, 194, 0.05), transparent 80%)`,
+            background: `radial-gradient(550px circle at ${coords.x}px ${coords.y}px, var(--zy-accent-orange-subtle), transparent 75%)`,
           }}
         />
       )}
