@@ -22,13 +22,13 @@ export function Hero() {
         {/* Main Editorial Header Block */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6 sm:space-y-8">
           {/* Top Pill / Kicker */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E7E6DF] shadow-2xs text-xs font-mono font-medium text-[#17191F]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--zy-surface)] border border-[var(--zy-border)] shadow-2xs text-xs font-mono font-medium text-[var(--zy-text)]">
             <Sparkles className="w-3.5 h-3.5 text-[#FFAA45]" />
             <span>A New Medium for Learning Technology</span>
           </div>
 
           {/* Large Editorial Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-bold text-[#17191F] tracking-tight leading-[1.08] text-balance">
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-bold text-[var(--zy-text)] tracking-tight leading-[1.08] text-balance">
             Understand Technology.{" "}
             <span className="text-[#FFAA45] block sm:inline">
               Don&apos;t Just Memorize It.
@@ -36,7 +36,7 @@ export function Hero() {
           </h1>
 
           {/* Supporting Text */}
-          <p className="text-lg sm:text-xl text-[#777B85] font-sans leading-relaxed max-w-2xl text-balance">
+          <p className="text-lg sm:text-xl text-[var(--zy-muted)] font-sans leading-relaxed max-w-2xl text-balance">
             From your first line of Python to building intelligent machine learning
             systems, discover technology through interactive experiences, visual
             explanations, and real-world projects.
@@ -54,7 +54,7 @@ export function Hero() {
 
             <Link
               href="/how-we-teach"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-base font-medium bg-white hover:bg-[#F8F7F3] text-[#17191F] border border-[#E7E6DF] shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-98"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-base font-medium bg-[var(--zy-surface)] hover:bg-[var(--zy-surface-2)] text-[var(--zy-text)] border border-[var(--zy-border)] shadow-2xs hover:shadow-xs transition-all duration-200 active:scale-98"
             >
               <Compass className="w-4 h-4 text-[#25B8A5]" />
               <span>Explore Our Approach</span>
@@ -62,17 +62,17 @@ export function Hero() {
           </div>
 
           {/* Platform Credibility Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 pt-3 text-xs font-mono text-[#777B85]">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 pt-3 text-xs font-mono text-[var(--zy-muted)]">
             <div className="flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-[#FFAA45]" />
               <span>100% In-Browser Execution</span>
             </div>
-            <span className="hidden sm:inline text-[#E7E6DF]">•</span>
+            <span className="hidden sm:inline text-[var(--zy-border)]">•</span>
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-[#25B8A5]" />
               <span>Interactive Memory Models</span>
             </div>
-            <span className="hidden sm:inline text-[#E7E6DF]">•</span>
+            <span className="hidden sm:inline text-[var(--zy-border)]">•</span>
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#FFAA45]" />
               <span>Zero Setup Required</span>

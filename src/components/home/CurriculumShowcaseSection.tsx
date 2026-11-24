@@ -59,7 +59,7 @@ export function CurriculumShowcaseSection() {
       subtitle: "Pandas manipulation, exploratory profiling, imputation & feature pipelines.",
       icon: TableProperties,
       tags: ["DataFrame Indexing", "GroupBy Split-Apply", "Outlier Imputation", "Feature Cleansing"],
-      accentColor: "#17191F",
+      accentColor: "#FFAA45",
       visualType: "table",
       highlight: "Transform messy real-world CSVs into clean data signals.",
     },
@@ -70,7 +70,7 @@ export function CurriculumShowcaseSection() {
       subtitle: "Statistical graphics, distribution aesthetics, publication design & interactive maps.",
       icon: BarChart3,
       tags: ["Matplotlib Anatomy", "Seaborn Distributions", "Interactive Plotly", "Visual Hierarchy"],
-      accentColor: "#FFAA45",
+      accentColor: "#25B8A5",
       visualType: "chart",
       highlight: "Tell undeniable stories with clean statistical plots.",
     },
@@ -81,7 +81,7 @@ export function CurriculumShowcaseSection() {
       subtitle: "Loss surfaces, gradient descent optimization, decision boundaries & clustering.",
       icon: BrainCircuit,
       tags: ["Gradient Descent", "Logistic Decision Contours", "Random Forests", "K-Means Space"],
-      accentColor: "#25B8A5",
+      accentColor: "#FFAA45",
       visualType: "neural",
       highlight: "Watch weights navigate loss landscapes in real time.",
     },
@@ -92,7 +92,7 @@ export function CurriculumShowcaseSection() {
       subtitle: "Production ML pipelines, API deployments, model evaluation & autonomous agents.",
       icon: Rocket,
       tags: ["End-to-End Pipeline", "FastAPI Serving", "Model Monitoring", "Autonomous Workflows"],
-      accentColor: "#17191F",
+      accentColor: "#25B8A5",
       visualType: "pipeline",
       highlight: "Deploy working intelligence to production infrastructure.",
     },
@@ -102,21 +102,21 @@ export function CurriculumShowcaseSection() {
   const ActiveIcon = active.icon;
 
   return (
-    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#FFFFFF] border-t border-[#E7E6DF]">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[var(--zy-surface)] border-t border-[var(--zy-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 sm:mb-20">
           <div className="max-w-2xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF9F5] border border-[#E7E6DF] text-xs font-mono font-medium text-[#17191F]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--zy-surface-2)] border border-[var(--zy-border)] text-xs font-mono font-medium text-[var(--zy-text)]">
               <GraduationCap className="w-3.5 h-3.5 text-[#FFAA45]" />
               <span>Comprehensive Technical Syllabus</span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl font-display font-bold text-[#17191F] tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-5xl font-display font-bold text-[var(--zy-text)] tracking-tight leading-tight">
               Explore Our Curriculum
             </h2>
 
-            <p className="text-base sm:text-lg text-[#777B85] font-sans leading-relaxed">
+            <p className="text-base sm:text-lg text-[var(--zy-muted)] font-sans leading-relaxed">
               Six foundational pillars taking you from your first terminal command
               to designing and deploying real-world machine learning systems.
             </p>
@@ -124,7 +124,7 @@ export function CurriculumShowcaseSection() {
 
           <Link
             href="/curriculum"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-[#FAF9F5] hover:bg-[#F1EFEA] text-[#17191F] border border-[#E7E6DF] transition-all duration-200 self-start md:self-auto"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-[var(--zy-surface-2)] hover:bg-[var(--zy-border)] text-[var(--zy-text)] border border-[var(--zy-border)] transition-all duration-200 self-start md:self-auto"
           >
             <span>View Full 8-Module Syllabus</span>
             <ArrowRight className="w-4 h-4 text-[#FFAA45]" />
@@ -145,28 +145,28 @@ export function CurriculumShowcaseSection() {
                   onClick={() => setSelectedPillar(pillar.id)}
                   className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex items-center justify-between ${
                     isSelected
-                      ? "bg-[#FAF9F5] border-[#17191F] shadow-xs"
-                      : "bg-white border-[#E7E6DF] hover:bg-[#FAF9F5]/60 hover:border-[#D5D4CC]"
+                      ? "bg-[var(--zy-surface-2)] border-[#FFAA45] shadow-xs"
+                      : "bg-[var(--zy-surface)] border-[var(--zy-border)] hover:bg-[var(--zy-surface-2)]/60"
                   }`}
                 >
                   <div className="flex items-center gap-3.5">
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0"
                       style={{
-                        backgroundColor: isSelected ? pillar.accentColor : "#FAF9F5",
-                        color: isSelected ? (pillar.accentColor === "#FFAA45" ? "#17191F" : "#FFFFFF") : "#777B85",
+                        backgroundColor: isSelected ? pillar.accentColor : "var(--zy-surface-2)",
+                        color: isSelected ? "#17191F" : "var(--zy-muted)",
                       }}
                     >
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-[#777B85]">{pillar.number}</span>
-                        <h3 className="text-base font-display font-bold text-[#17191F]">
+                        <span className="text-xs font-mono text-[var(--zy-muted)]">{pillar.number}</span>
+                        <h3 className="text-base font-display font-bold text-[var(--zy-text)]">
                           {pillar.title}
                         </h3>
                       </div>
-                      <p className="text-xs text-[#777B85] font-sans line-clamp-1 mt-0.5">
+                      <p className="text-xs text-[var(--zy-muted)] font-sans line-clamp-1 mt-0.5">
                         {pillar.highlight}
                       </p>
                     </div>
@@ -175,8 +175,8 @@ export function CurriculumShowcaseSection() {
                   <span
                     className={`text-xs font-mono px-2 py-0.5 rounded ${
                       isSelected
-                        ? "bg-[#17191F] text-white font-bold"
-                        : "text-[#777B85] group-hover:text-[#17191F]"
+                        ? "bg-[#FFAA45] text-[#17191F] font-bold"
+                        : "text-[var(--zy-muted)]"
                     }`}
                   >
                     {isSelected ? "Inspecting" : "Select"}
@@ -187,19 +187,19 @@ export function CurriculumShowcaseSection() {
           </div>
 
           {/* Right Column: Distinctive Interactive Pillar Preview Card (7 cols) */}
-          <div className="lg:col-span-7 bg-[#FAF9F5] rounded-3xl border border-[#E7E6DF] p-6 sm:p-8 lg:p-10 shadow-xs flex flex-col justify-between min-h-[500px]">
+          <div className="lg:col-span-7 bg-[var(--zy-surface-2)] rounded-3xl border border-[var(--zy-border)] p-6 sm:p-8 lg:p-10 shadow-xs flex flex-col justify-between min-h-[500px]">
             {/* Header of Active Pillar */}
             <div>
-              <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#E7E6DF]">
+              <div className="flex items-center justify-between pb-4 mb-6 border-b border-[var(--zy-border)]">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#17191F] text-white flex items-center justify-center shadow-xs">
-                    <ActiveIcon className="w-5 h-5 text-[#FFAA45]" />
+                  <div className="w-9 h-9 rounded-xl bg-[#FFAA45] text-[#17191F] flex items-center justify-center shadow-xs">
+                    <ActiveIcon className="w-5 h-5" />
                   </div>
                   <div>
                     <span className="text-xs font-mono font-bold text-[#FFAA45] block">
                       PILLAR {active.number} OF 06
                     </span>
-                    <h3 className="text-2xl font-display font-bold text-[#17191F]">
+                    <h3 className="text-2xl font-display font-bold text-[var(--zy-text)]">
                       {active.title}
                     </h3>
                   </div>
@@ -207,21 +207,21 @@ export function CurriculumShowcaseSection() {
 
                 <Link
                   href="/learn/module-1/episode-1"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono font-bold bg-white hover:bg-[#F8F7F3] text-[#17191F] border border-[#E7E6DF] transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-mono font-bold bg-[var(--zy-surface)] hover:bg-[var(--zy-surface-2)] text-[var(--zy-text)] border border-[var(--zy-border)] transition-colors"
                 >
                   <span>Start Module</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#FFAA45]" />
                 </Link>
               </div>
 
-              <p className="text-base text-[#777B85] font-sans leading-relaxed mb-6">
+              <p className="text-base text-[var(--zy-muted)] font-sans leading-relaxed mb-6">
                 {active.subtitle}
               </p>
 
               {/* Unique Visual Element based on Pillar Type */}
               <div className="my-6">
                 {active.visualType === "code" && (
-                  <div className="bg-[#17191F] rounded-2xl p-5 text-white font-mono text-xs space-y-2 shadow-inner">
+                  <div className="bg-[#12151D] rounded-2xl p-5 text-white font-mono text-xs space-y-2 shadow-inner border border-[#2A3142]">
                     <div className="flex justify-between text-[#8E95A5] text-[11px] pb-2 border-b border-[#2C303B]">
                       <span>memory_stack_test.py</span>
                       <span className="text-[#FFAA45]">Live Introspection</span>
@@ -239,49 +239,49 @@ export function CurriculumShowcaseSection() {
                 )}
 
                 {active.visualType === "matrix" && (
-                  <div className="bg-white rounded-2xl p-5 border border-[#E7E6DF] space-y-4">
+                  <div className="bg-[var(--zy-surface)] rounded-2xl p-5 border border-[var(--zy-border)] space-y-4">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-[#17191F]">2D TENSOR BROADCASTING</span>
+                      <span className="font-bold text-[var(--zy-text)]">2D TENSOR BROADCASTING</span>
                       <span className="text-[#25B8A5]">O(1) Memory Layout</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center font-mono text-xs">
                       {[1.2, 4.5, 9.8, 2.4, 6.1, 8.3].map((val, idx) => (
-                        <div key={idx} className="p-3 rounded-lg bg-[#FAF9F5] border border-[#E7E6DF] font-bold text-[#17191F]">
+                        <div key={idx} className="p-3 rounded-lg bg-[var(--zy-surface-2)] border border-[var(--zy-border)] font-bold text-[var(--zy-text)]">
                           {val}
                         </div>
                       ))}
                     </div>
-                    <p className="text-xs text-[#777B85] font-sans">
+                    <p className="text-xs text-[var(--zy-muted)] font-sans">
                       Visualize how NumPy stretches dimension shapes along singleton axes without copying physical bytes in RAM.
                     </p>
                   </div>
                 )}
 
                 {active.visualType === "table" && (
-                  <div className="bg-white rounded-2xl p-5 border border-[#E7E6DF] space-y-3">
+                  <div className="bg-[var(--zy-surface)] rounded-2xl p-5 border border-[var(--zy-border)] space-y-3">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-[#17191F]">PANDAS GROUPBY REDUCTION</span>
+                      <span className="font-bold text-[var(--zy-text)]">PANDAS GROUPBY REDUCTION</span>
                       <span className="text-[#FFAA45]">Clean Pipeline</span>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left font-mono text-xs">
                         <thead>
-                          <tr className="border-b border-[#E7E6DF] text-[#777B85]">
+                          <tr className="border-b border-[var(--zy-border)] text-[var(--zy-muted)]">
                             <th className="pb-2">Cohort</th>
                             <th className="pb-2">Retention</th>
                             <th className="pb-2">Latency (ms)</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#E7E6DF]">
+                        <tbody className="divide-y divide-[var(--zy-border)]">
                           <tr>
-                            <td className="py-2 font-bold text-[#17191F]">Alpha</td>
+                            <td className="py-2 font-bold text-[var(--zy-text)]">Alpha</td>
                             <td className="py-2 text-[#0E7568] font-bold">94.2%</td>
-                            <td className="py-2 text-[#777B85]">18.4</td>
+                            <td className="py-2 text-[var(--zy-muted)]">18.4</td>
                           </tr>
                           <tr>
-                            <td className="py-2 font-bold text-[#17191F]">Beta</td>
+                            <td className="py-2 font-bold text-[var(--zy-text)]">Beta</td>
                             <td className="py-2 text-[#0E7568] font-bold">89.6%</td>
-                            <td className="py-2 text-[#777B85]">22.1</td>
+                            <td className="py-2 text-[var(--zy-muted)]">22.1</td>
                           </tr>
                         </tbody>
                       </table>
@@ -290,9 +290,9 @@ export function CurriculumShowcaseSection() {
                 )}
 
                 {active.visualType === "chart" && (
-                  <div className="bg-white rounded-2xl p-5 border border-[#E7E6DF] space-y-3">
+                  <div className="bg-[var(--zy-surface)] rounded-2xl p-5 border border-[var(--zy-border)] space-y-3">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-[#17191F]">STATISTICAL DENSITY ESTIMATE</span>
+                      <span className="font-bold text-[var(--zy-text)]">STATISTICAL DENSITY ESTIMATE</span>
                       <span className="text-[#FFAA45]">Normal Distribution</span>
                     </div>
                     <div className="h-28 flex items-end justify-between gap-1.5 px-2 pt-4">
@@ -307,50 +307,50 @@ export function CurriculumShowcaseSection() {
                         />
                       ))}
                     </div>
-                    <p className="text-xs text-[#777B85] font-sans">
+                    <p className="text-xs text-[var(--zy-muted)] font-sans">
                       Learn the visual grammar of data: axes scales, quantile curves, and publication-ready formatting.
                     </p>
                   </div>
                 )}
 
                 {active.visualType === "neural" && (
-                  <div className="bg-white rounded-2xl p-5 border border-[#E7E6DF] space-y-3">
+                  <div className="bg-[var(--zy-surface)] rounded-2xl p-5 border border-[var(--zy-border)] space-y-3">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-[#17191F]">LOSS LANDSCAPE CONVERGENCE</span>
+                      <span className="font-bold text-[var(--zy-text)]">LOSS LANDSCAPE CONVERGENCE</span>
                       <span className="text-[#25B8A5]">Epoch 140 / 200</span>
                     </div>
-                    <div className="p-3 bg-[#FAF9F5] rounded-xl border border-[#E7E6DF] flex items-center justify-between font-mono text-xs">
+                    <div className="p-3 bg-[var(--zy-surface-2)] rounded-xl border border-[var(--zy-border)] flex items-center justify-between font-mono text-xs">
                       <div>
-                        <span className="text-[#777B85] block text-[10px]">CURRENT LOSS:</span>
-                        <span className="font-bold text-[#17191F]">J(w, b) = 0.042</span>
+                        <span className="text-[var(--zy-muted)] block text-[10px]">CURRENT LOSS:</span>
+                        <span className="font-bold text-[var(--zy-text)]">J(w, b) = 0.042</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[#777B85] block text-[10px]">LEARNING RATE:</span>
+                        <span className="text-[var(--zy-muted)] block text-[10px]">LEARNING RATE:</span>
                         <span className="font-bold text-[#25B8A5]">α = 0.01</span>
                       </div>
                     </div>
-                    <p className="text-xs text-[#777B85] font-sans">
+                    <p className="text-xs text-[var(--zy-muted)] font-sans">
                       Derive gradient descent step-by-step with interactive 3D convex surfaces before training deep networks.
                     </p>
                   </div>
                 )}
 
                 {active.visualType === "pipeline" && (
-                  <div className="bg-white rounded-2xl p-5 border border-[#E7E6DF] space-y-3">
+                  <div className="bg-[var(--zy-surface)] rounded-2xl p-5 border border-[var(--zy-border)] space-y-3">
                     <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="font-bold text-[#17191F]">PRODUCTION ML DEPLOYMENT</span>
+                      <span className="font-bold text-[var(--zy-text)]">PRODUCTION ML DEPLOYMENT</span>
                       <span className="text-[#0E7568]">Status: Healthy</span>
                     </div>
                     <div className="flex items-center justify-between text-xs font-mono gap-2 text-center">
-                      <div className="p-2.5 bg-[#FAF9F5] rounded-lg border border-[#E7E6DF] flex-1">
+                      <div className="p-2.5 bg-[var(--zy-surface-2)] rounded-lg border border-[var(--zy-border)] flex-1 text-[var(--zy-text)]">
                         Kafka Ingest
                       </div>
                       <span className="text-[#FFAA45]">→</span>
-                      <div className="p-2.5 bg-[#FFAA45]/15 border border-[#FFAA45] rounded-lg flex-1 text-[#B45E00] font-bold">
+                      <div className="p-2.5 bg-[#FFAA45]/20 border border-[#FFAA45] rounded-lg flex-1 text-[#E68522] font-bold">
                         ONNX Model
                       </div>
                       <span className="text-[#FFAA45]">→</span>
-                      <div className="p-2.5 bg-[#25B8A5]/15 border border-[#25B8A5] rounded-lg flex-1 text-[#0E7568] font-bold">
+                      <div className="p-2.5 bg-[#25B8A5]/20 border border-[#25B8A5] rounded-lg flex-1 text-[#0E7568] font-bold">
                         FastAPI
                       </div>
                     </div>
@@ -363,7 +363,7 @@ export function CurriculumShowcaseSection() {
                 {active.tags.map((tag, idx) => (
                   <span
                     key={idx}
-                    className="px-3 py-1.5 rounded-lg text-xs font-mono bg-white border border-[#E7E6DF] text-[#17191F] shadow-2xs"
+                    className="px-3 py-1.5 rounded-lg text-xs font-mono bg-[var(--zy-surface)] border border-[var(--zy-border)] text-[var(--zy-text)] shadow-2xs"
                   >
                     {tag}
                   </span>
@@ -372,11 +372,11 @@ export function CurriculumShowcaseSection() {
             </div>
 
             {/* Bottom Card Footer */}
-            <div className="pt-6 border-t border-[#E7E6DF] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#777B85]">
+            <div className="pt-6 border-t border-[var(--zy-border)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[var(--zy-muted)]">
               <span>Includes interactive 3D simulations &amp; graded tests</span>
               <Link
                 href="/learn/module-1/episode-1"
-                className="text-[#17191F] font-bold hover:text-[#FFAA45] transition-colors flex items-center gap-1"
+                className="text-[var(--zy-text)] font-bold hover:text-[#FFAA45] transition-colors flex items-center gap-1"
               >
                 <span>Jump into Episode 1</span>
                 <ArrowRight className="w-3.5 h-3.5" />

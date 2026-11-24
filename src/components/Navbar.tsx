@@ -4,13 +4,14 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowRight, Sun, Moon } from "lucide-react";
+import { ZyrixLogo } from "@/components/ZyrixLogo";
 
 interface NavbarProps {
   theme?: "dark" | "light";
   onToggleTheme?: () => void;
 }
 
-export function Navbar({ theme = "dark", onToggleTheme }: NavbarProps = {}) {
+export function Navbar({ theme = "light", onToggleTheme }: NavbarProps = {}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
@@ -39,29 +40,10 @@ export function Navbar({ theme = "dark", onToggleTheme }: NavbarProps = {}) {
           {/* Logo Mark & Wordmark */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 group transition-transform active:scale-98"
+            className="group transition-transform active:scale-98"
             aria-label="Zyrix Home"
           >
-            {/* Logo Mark */}
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#17191F] flex items-center justify-center shadow-xs text-white transition-all duration-200 group-hover:scale-105 relative overflow-hidden border border-[var(--zy-border)]">
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[var(--zy-accent-orange)] opacity-90" />
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="relative z-10"
-              >
-                <path
-                  d="M6 7.5C6 6.67157 6.67157 6 7.5 6H16.5C17.3284 6 18 6.67157 18 7.5C18 8.01633 17.7348 8.4907 17.3 8.76L8.8 14.5H16.5C17.3284 14.5 18 15.1716 18 16C18 16.8284 17.3284 17.5 16.5 17.5H7.5C6.67157 17.5 6 16.8284 6 16C6 15.4837 6.26524 15.0093 6.7 14.74L15.2 9H7.5C6.67157 9 6 8.32843 6 7.5Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
-            <span className="text-xl font-display font-bold tracking-tight text-[var(--zy-text)]">
-              Zyrix
-            </span>
+            <ZyrixLogo size="md" />
           </Link>
 
           {/* Desktop Navigation Links */}

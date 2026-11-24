@@ -46,20 +46,20 @@ export function InteractiveLearningShowcase() {
   };
 
   return (
-    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#FAF9F5] border-t border-[#E7E6DF]">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[var(--zy-bg)] border-t border-[var(--zy-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center space-y-4 mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#E7E6DF] text-xs font-mono font-medium text-[#17191F]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--zy-surface)] border border-[var(--zy-border)] text-xs font-mono font-medium text-[var(--zy-text)]">
             <Cpu className="w-3.5 h-3.5 text-[#25B8A5]" />
             <span>Interactive Learning Showcase</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-display font-bold text-[#17191F] tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-display font-bold text-[var(--zy-text)] tracking-tight leading-tight">
             See How Zyrix Makes Code Click.
           </h2>
 
-          <p className="text-base sm:text-lg text-[#777B85] font-sans leading-relaxed text-balance">
+          <p className="text-base sm:text-lg text-[var(--zy-muted)] font-sans leading-relaxed text-balance">
             Interact directly with our living execution mechanics. Tweak inputs, trigger bugs,
             and inspect how memory, tensors, and pipelines transform before your eyes.
           </p>
@@ -71,11 +71,11 @@ export function InteractiveLearningShowcase() {
               onClick={() => setActiveTab("variables")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "variables"
-                  ? "bg-[#17191F] text-white shadow-xs"
-                  : "bg-white text-[#777B85] hover:text-[#17191F] border border-[#E7E6DF]"
+                  ? "bg-[#FFAA45] text-[#17191F] font-bold shadow-xs"
+                  : "bg-[var(--zy-surface)] text-[var(--zy-muted)] hover:text-[var(--zy-text)] border border-[var(--zy-border)]"
               }`}
             >
-              <Layers className="w-4 h-4 text-[#FFAA45]" />
+              <Layers className="w-4 h-4 text-[#17191F]" />
               <span>01. Variable State Machine</span>
             </button>
 
@@ -84,11 +84,11 @@ export function InteractiveLearningShowcase() {
               onClick={() => setActiveTab("dataflow")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "dataflow"
-                  ? "bg-[#17191F] text-white shadow-xs"
-                  : "bg-white text-[#777B85] hover:text-[#17191F] border border-[#E7E6DF]"
+                  ? "bg-[#25B8A5] text-white font-bold shadow-xs"
+                  : "bg-[var(--zy-surface)] text-[var(--zy-muted)] hover:text-[var(--zy-text)] border border-[var(--zy-border)]"
               }`}
             >
-              <Filter className="w-4 h-4 text-[#25B8A5]" />
+              <Filter className="w-4 h-4 text-white" />
               <span>02. Data Flow Pipeline</span>
             </button>
 
@@ -97,40 +97,40 @@ export function InteractiveLearningShowcase() {
               onClick={() => setActiveTab("debugger")}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                 activeTab === "debugger"
-                  ? "bg-[#17191F] text-white shadow-xs"
-                  : "bg-white text-[#777B85] hover:text-[#17191F] border border-[#E7E6DF]"
+                  ? "bg-[#FFAA45] text-[#17191F] font-bold shadow-xs"
+                  : "bg-[var(--zy-surface)] text-[var(--zy-muted)] hover:text-[var(--zy-text)] border border-[var(--zy-border)]"
               }`}
             >
-              <Bug className="w-4 h-4 text-[#FFAA45]" />
+              <Bug className="w-4 h-4 text-[#17191F]" />
               <span>03. Interactive Debugger</span>
             </button>
           </div>
         </div>
 
         {/* The Live Interactive Showcase Box */}
-        <div className="bg-white rounded-3xl border border-[#E7E6DF] p-6 sm:p-8 lg:p-10 shadow-[0_8px_32px_-8px_rgba(23,25,31,0.06)]">
+        <div className="bg-[var(--zy-surface)] rounded-3xl border border-[var(--zy-border)] p-6 sm:p-8 lg:p-10 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)]">
           {/* TAB 1: VARIABLE STATE MACHINE */}
           {activeTab === "variables" && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Code & Control Side (5 cols) */}
-              <div className="lg:col-span-5 bg-[#17191F] rounded-2xl p-6 text-white font-mono text-xs sm:text-sm space-y-5 shadow-inner">
+              <div className="lg:col-span-5 bg-[#12151D] rounded-2xl p-6 text-white font-mono text-xs sm:text-sm space-y-5 shadow-inner border border-[#2A3142]">
                 <div className="flex items-center justify-between pb-3 border-b border-[#2C303B] text-xs text-[#8E95A5]">
                   <span>variable_mutations.py</span>
                   <span className="text-[#FFAA45]">Live WebAssembly</span>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="p-2 rounded-lg bg-[#252A36]">
+                  <div className="p-2 rounded-lg bg-[#1E2330]">
                     <span className="text-[#FFAA45]">score</span> = {userScore}
                   </div>
-                  <div className="p-2 rounded-lg bg-[#252A36]">
+                  <div className="p-2 rounded-lg bg-[#1E2330]">
                     <span className="text-[#FFAA45]">bonus</span> = {bonusAmount}
                   </div>
-                  <div className="p-2 rounded-lg bg-[#252A36]">
+                  <div className="p-2 rounded-lg bg-[#1E2330]">
                     <span className="text-[#25B8A5]">total</span> = score + bonus{" "}
                     <span className="text-[#8E95A5]"># → {totalScore}</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-[#252A36]">
+                  <div className="p-2 rounded-lg bg-[#1E2330]">
                     <span className="text-[#25B8A5]">is_winner</span> = total &gt;= 20{" "}
                     <span className={isWinner ? "text-[#00CA4E] font-bold" : "text-[#FF6B81] font-bold"}>
                       # → {isWinner ? "True" : "False"}
@@ -170,9 +170,9 @@ export function InteractiveLearningShowcase() {
               </div>
 
               {/* Memory Visualizer Side (7 cols) */}
-              <div className="lg:col-span-7 bg-[#FAF9F5] rounded-2xl p-6 sm:p-8 border border-[#E7E6DF] space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E7E6DF]">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#17191F]">
+              <div className="lg:col-span-7 bg-[var(--zy-surface-2)] rounded-2xl p-6 sm:p-8 border border-[var(--zy-border)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--zy-border)]">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--zy-text)]">
                     Stack Reference &amp; Heap Storage Map
                   </span>
                   <span className="text-xs font-mono text-[#0E7568] bg-[#25B8A5]/15 px-2.5 py-0.5 rounded-md font-bold">
@@ -182,18 +182,18 @@ export function InteractiveLearningShowcase() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Memory Cell: score */}
-                  <div className="p-4 rounded-xl bg-white border border-[#E7E6DF] shadow-2xs space-y-1">
-                    <div className="flex justify-between items-center text-xs font-mono text-[#777B85]">
+                  <div className="p-4 rounded-xl bg-[var(--zy-surface)] border border-[var(--zy-border)] shadow-2xs space-y-1">
+                    <div className="flex justify-between items-center text-xs font-mono text-[var(--zy-muted)]">
                       <span>VAR: score</span>
                       <span className="text-[10px]">addr: 0x7FA1</span>
                     </div>
-                    <div className="text-2xl font-mono font-bold text-[#17191F]">{userScore}</div>
+                    <div className="text-2xl font-mono font-bold text-[var(--zy-text)]">{userScore}</div>
                     <span className="text-[10px] font-mono text-[#25B8A5]">Type: int (4 bytes)</span>
                   </div>
 
                   {/* Memory Cell: bonus */}
-                  <div className="p-4 rounded-xl bg-white border border-[#E7E6DF] shadow-2xs space-y-1">
-                    <div className="flex justify-between items-center text-xs font-mono text-[#777B85]">
+                  <div className="p-4 rounded-xl bg-[var(--zy-surface)] border border-[var(--zy-border)] shadow-2xs space-y-1">
+                    <div className="flex justify-between items-center text-xs font-mono text-[var(--zy-muted)]">
                       <span>VAR: bonus</span>
                       <span className="text-[10px]">addr: 0x7FA5</span>
                     </div>
@@ -202,8 +202,8 @@ export function InteractiveLearningShowcase() {
                   </div>
 
                   {/* Memory Cell: total */}
-                  <div className="p-4 rounded-xl bg-white border border-[#E7E6DF] shadow-2xs space-y-1">
-                    <div className="flex justify-between items-center text-xs font-mono text-[#777B85]">
+                  <div className="p-4 rounded-xl bg-[var(--zy-surface)] border border-[var(--zy-border)] shadow-2xs space-y-1">
+                    <div className="flex justify-between items-center text-xs font-mono text-[var(--zy-muted)]">
                       <span>VAR: total</span>
                       <span className="text-[10px]">addr: 0x7FAC</span>
                     </div>
@@ -215,30 +215,30 @@ export function InteractiveLearningShowcase() {
                   <div
                     className={`p-4 rounded-xl border shadow-2xs space-y-1 transition-all ${
                       isWinner
-                        ? "bg-[#25B8A5]/10 border-[#25B8A5]"
-                        : "bg-white border-[#E7E6DF]"
+                        ? "bg-[#25B8A5]/15 border-[#25B8A5]"
+                        : "bg-[var(--zy-surface)] border-[var(--zy-border)]"
                     }`}
                   >
-                    <div className="flex justify-between items-center text-xs font-mono text-[#777B85]">
+                    <div className="flex justify-between items-center text-xs font-mono text-[var(--zy-muted)]">
                       <span>VAR: is_winner</span>
                       <span className="text-[10px]">addr: 0x7FB2</span>
                     </div>
                     <div
                       className={`text-2xl font-mono font-bold ${
-                        isWinner ? "text-[#0E7568]" : "text-[#777B85]"
+                        isWinner ? "text-[#0E7568]" : "text-[var(--zy-muted)]"
                       }`}
                     >
                       {isWinner ? "True" : "False"}
                     </div>
-                    <span className="text-[10px] font-mono text-[#777B85]">
+                    <span className="text-[10px] font-mono text-[var(--zy-muted)]">
                       Condition: {totalScore} &gt;= 20
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-3 flex items-center justify-between text-xs font-mono text-[#777B85]">
+                <div className="pt-3 flex items-center justify-between text-xs font-mono text-[var(--zy-muted)]">
                   <span>Memory updates in real time with 0 re-compilation delay</span>
-                  <span className="text-[#17191F] font-semibold">Ready for Episode 2</span>
+                  <span className="text-[var(--zy-text)] font-semibold">Ready for Episode 2</span>
                 </div>
               </div>
             </div>
@@ -248,9 +248,9 @@ export function InteractiveLearningShowcase() {
           {activeTab === "dataflow" && (
             <div className="space-y-8">
               {/* Controls Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF9F5] border border-[#E7E6DF]">
+              <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[var(--zy-surface-2)] border border-[var(--zy-border)]">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono font-bold uppercase text-[#17191F]">
+                  <span className="text-xs font-mono font-bold uppercase text-[var(--zy-text)]">
                     Pipeline Controls:
                   </span>
                   <button
@@ -259,7 +259,7 @@ export function InteractiveLearningShowcase() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                       filterPositives
                         ? "bg-[#25B8A5] text-white shadow-2xs"
-                        : "bg-white text-[#777B85] border border-[#E7E6DF]"
+                        : "bg-[var(--zy-surface)] text-[var(--zy-muted)] border border-[var(--zy-border)]"
                     }`}
                   >
                     Filter &gt; 0: {filterPositives ? "ON" : "OFF"}
@@ -267,7 +267,7 @@ export function InteractiveLearningShowcase() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-[#777B85]">Multiply by:</span>
+                  <span className="text-xs font-mono text-[var(--zy-muted)]">Multiply by:</span>
                   {[1, 2, 5, 10].map((m) => (
                     <button
                       key={m}
@@ -276,7 +276,7 @@ export function InteractiveLearningShowcase() {
                       className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold transition-colors cursor-pointer ${
                         multiplier === m
                           ? "bg-[#FFAA45] text-[#17191F] shadow-2xs"
-                          : "bg-white text-[#777B85] border border-[#E7E6DF]"
+                          : "bg-[var(--zy-surface)] text-[var(--zy-muted)] border border-[var(--zy-border)]"
                       }`}
                     >
                       {m}x
@@ -288,8 +288,8 @@ export function InteractiveLearningShowcase() {
               {/* Visual Pipeline Flow */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                 {/* Stage 1: Input */}
-                <div className="p-5 rounded-2xl bg-white border border-[#E7E6DF] shadow-xs space-y-3">
-                  <div className="flex items-center justify-between text-xs font-mono text-[#777B85]">
+                <div className="p-5 rounded-2xl bg-[var(--zy-surface)] border border-[var(--zy-border)] shadow-xs space-y-3">
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--zy-muted)]">
                     <span>STAGE 1: RAW INGEST</span>
                     <span>{rawData.length} items</span>
                   </div>
@@ -299,22 +299,22 @@ export function InteractiveLearningShowcase() {
                         key={i}
                         className={`w-9 h-9 rounded-lg flex items-center justify-center font-mono text-xs font-bold ${
                           num < 0 && filterPositives
-                            ? "bg-[#FAF9F5] text-[#A0A6B5] line-through border border-dashed border-[#E7E6DF]"
-                            : "bg-[#17191F] text-white"
+                            ? "bg-[var(--zy-surface-2)] text-[var(--zy-muted)]/50 line-through border border-dashed border-[var(--zy-border)]"
+                            : "bg-[#FFAA45] text-[#17191F]"
                         }`}
                       >
                         {num}
                       </span>
                     ))}
                   </div>
-                  <span className="text-[11px] font-sans text-[#777B85] block">
+                  <span className="text-[11px] font-sans text-[var(--zy-muted)] block">
                     {filterPositives ? "Negative values discarded" : "All values passed through"}
                   </span>
                 </div>
 
                 {/* Stage 2: Map */}
-                <div className="p-5 rounded-2xl bg-white border border-[#E7E6DF] shadow-xs space-y-3">
-                  <div className="flex items-center justify-between text-xs font-mono text-[#777B85]">
+                <div className="p-5 rounded-2xl bg-[var(--zy-surface)] border border-[var(--zy-border)] shadow-xs space-y-3">
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--zy-muted)]">
                     <span>STAGE 2: MAP (×{multiplier})</span>
                     <span className="text-[#FFAA45] font-bold">{mappedData.length} active</span>
                   </div>
@@ -322,27 +322,27 @@ export function InteractiveLearningShowcase() {
                     {mappedData.map((num, i) => (
                       <span
                         key={i}
-                        className="w-10 h-9 rounded-lg bg-[#FFAA45]/20 border border-[#FFAA45] text-[#B45E00] flex items-center justify-center font-mono text-xs font-bold"
+                        className="w-10 h-9 rounded-lg bg-[#FFAA45]/20 border border-[#FFAA45] text-[#E68522] flex items-center justify-center font-mono text-xs font-bold"
                       >
                         {num}
                       </span>
                     ))}
                   </div>
-                  <span className="text-[11px] font-sans text-[#777B85] block">
+                  <span className="text-[11px] font-sans text-[var(--zy-muted)] block">
                     Vectorized scale across SIMD registers
                   </span>
                 </div>
 
                 {/* Stage 3: Reduce */}
-                <div className="p-5 rounded-2xl bg-white border-2 border-[#25B8A5] shadow-xs space-y-3">
-                  <div className="flex items-center justify-between text-xs font-mono text-[#777B85]">
+                <div className="p-5 rounded-2xl bg-[var(--zy-surface)] border-2 border-[#25B8A5] shadow-xs space-y-3">
+                  <div className="flex items-center justify-between text-xs font-mono text-[var(--zy-muted)]">
                     <span>STAGE 3: REDUCE (SUM)</span>
                     <span className="text-[#0E7568] font-bold">Accumulated</span>
                   </div>
                   <div className="text-3xl font-mono font-bold text-[#0E7568]">
                     Σ = {reducedSum}
                   </div>
-                  <span className="text-[11px] font-sans text-[#777B85] block">
+                  <span className="text-[11px] font-sans text-[var(--zy-muted)] block">
                     Instant reduction without memory allocation
                   </span>
                 </div>
@@ -354,7 +354,7 @@ export function InteractiveLearningShowcase() {
           {activeTab === "debugger" && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               {/* Bug Code Column (6 cols) */}
-              <div className="lg:col-span-6 bg-[#17191F] rounded-2xl p-6 text-white font-mono text-xs sm:text-sm space-y-4 shadow-inner">
+              <div className="lg:col-span-6 bg-[#12151D] rounded-2xl p-6 text-white font-mono text-xs sm:text-sm space-y-4 shadow-inner border border-[#2A3142]">
                 <div className="flex items-center justify-between pb-3 border-b border-[#2C303B] text-xs text-[#8E95A5]">
                   <span>off_by_one_trap.py</span>
                   <span className={isBugFixed ? "text-[#00CA4E]" : "text-[#FF605C]"}>
@@ -410,20 +410,20 @@ export function InteractiveLearningShowcase() {
               </div>
 
               {/* Debugger Output Column (6 cols) */}
-              <div className="lg:col-span-6 bg-[#FAF9F5] rounded-2xl p-6 sm:p-8 border border-[#E7E6DF] space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E7E6DF]">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#17191F]">
+              <div className="lg:col-span-6 bg-[var(--zy-surface-2)] rounded-2xl p-6 sm:p-8 border border-[var(--zy-border)] space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--zy-border)]">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[var(--zy-text)]">
                     Visual Execution Feedback
                   </span>
-                  <span className="text-xs font-mono text-[#777B85]">PDB Trace Simulator</span>
+                  <span className="text-xs font-mono text-[var(--zy-muted)]">PDB Trace Simulator</span>
                 </div>
 
                 {debugOutput ? (
                   <div
                     className={`p-4 rounded-xl border text-xs font-mono leading-relaxed space-y-2 animate-in fade-in duration-200 ${
                       isBugFixed
-                        ? "bg-[#25B8A5]/10 border-[#25B8A5] text-[#0E7568]"
-                        : "bg-[#E04D62]/10 border-[#E04D62] text-[#E04D62]"
+                        ? "bg-[#25B8A5]/15 border-[#25B8A5] text-[#0E7568]"
+                        : "bg-[#E04D62]/15 border-[#E04D62] text-[#E04D62]"
                     }`}
                   >
                     <div className="flex items-center gap-2 font-bold text-sm">
@@ -437,12 +437,12 @@ export function InteractiveLearningShowcase() {
                     <p>{debugOutput}</p>
                   </div>
                 ) : (
-                  <div className="p-8 text-center text-xs font-mono text-[#777B85] bg-white rounded-xl border border-dashed border-[#E7E6DF]">
+                  <div className="p-8 text-center text-xs font-mono text-[var(--zy-muted)] bg-[var(--zy-surface)] rounded-xl border border-dashed border-[var(--zy-border)]">
                     Click &apos;Run In Pyodide&apos; to execute the script in our sandboxed browser environment.
                   </div>
                 )}
 
-                <div className="pt-2 text-xs text-[#777B85] font-sans leading-relaxed">
+                <div className="pt-2 text-xs text-[var(--zy-muted)] font-sans leading-relaxed">
                   💡 In Zyrix Debug Challenges, students fix intentionally placed algorithmic bugs, teaching defensive coding and stack-trace intuition from day one.
                 </div>
               </div>

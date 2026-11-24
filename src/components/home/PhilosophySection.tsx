@@ -32,27 +32,27 @@ export function PhilosophySection() {
   ];
 
   return (
-    <section className="relative py-20 sm:py-28 lg:py-32 bg-[#FFFFFF] border-t border-[#E7E6DF] overflow-hidden">
+    <section className="relative py-20 sm:py-28 lg:py-32 bg-[var(--zy-surface)] border-t border-[var(--zy-border)] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Philosophy Header & Manifesto */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Mission Statement (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF9F5] border border-[#E7E6DF] text-xs font-mono font-medium text-[#B45E00]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--zy-surface-2)] border border-[var(--zy-border)] text-xs font-mono font-medium text-[#FFAA45]">
               <Heart className="w-3.5 h-3.5 text-[#FFAA45]" />
               <span>Our Core Conviction</span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl font-display font-bold text-[#17191F] tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-5xl font-display font-bold text-[var(--zy-text)] tracking-tight leading-tight">
               Education Should Be Accessible to Everyone.
             </h2>
 
-            <p className="text-base sm:text-lg text-[#777B85] font-sans leading-relaxed">
+            <p className="text-base sm:text-lg text-[var(--zy-muted)] font-sans leading-relaxed">
               We started Zyrix because computer science education has spent forty years
               making simple, elegant truths look intimidating and inaccessible.
             </p>
 
-            <blockquote className="p-6 rounded-2xl bg-[#FAF9F5] border-l-4 border-[#FFAA45] font-sans text-sm sm:text-base text-[#17191F] italic leading-relaxed">
+            <blockquote className="p-6 rounded-2xl bg-[var(--zy-surface-2)] border-l-4 border-[#FFAA45] font-sans text-sm sm:text-base text-[var(--zy-text)] italic leading-relaxed">
               &quot;Anyone who can understand a story can understand a neural network — if only it is taught through the medium where it makes physical sense.&quot;
             </blockquote>
           </div>
@@ -64,15 +64,15 @@ export function PhilosophySection() {
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl sm:rounded-3xl bg-[#FAF9F5] border border-[#E7E6DF] space-y-3 transition-all duration-300 hover:shadow-xs hover:border-[#D5D4CC]"
+                  className="p-6 rounded-2xl sm:rounded-3xl bg-[var(--zy-surface-2)] border border-[var(--zy-border)] space-y-3 transition-all duration-300 hover:shadow-xs hover:border-[#FFAA45]"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white border border-[#E7E6DF] text-[#17191F] flex items-center justify-center shadow-2xs">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--zy-surface)] border border-[var(--zy-border)] text-[var(--zy-text)] flex items-center justify-center shadow-2xs">
                     <Icon className="w-5 h-5 text-[#FFAA45]" />
                   </div>
-                  <h3 className="text-lg font-display font-bold text-[#17191F]">
+                  <h3 className="text-lg font-display font-bold text-[var(--zy-text)]">
                     {val.title}
                   </h3>
-                  <p className="text-sm text-[#777B85] font-sans leading-relaxed">
+                  <p className="text-sm text-[var(--zy-muted)] font-sans leading-relaxed">
                     {val.description}
                   </p>
                 </div>
