@@ -17,7 +17,7 @@ function checkWebGL(): "supported" | "unsupported" {
   }
 }
 
-const noopSubscribe = () => () => { };
+const noopSubscribe = () => () => {};
 
 export function Footer() {
   const webglStatus = useSyncExternalStore(
@@ -29,10 +29,10 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-[#FBF6EF] text-[#2B2521] border-t border-[#E6DCC8] pt-16 pb-12">
+    <footer className="w-full bg-[var(--zy-bg,#FBF6EF)] text-[var(--zy-text,#2B2521)] border-t border-[var(--zy-border,#E6DCC8)] pt-16 pb-12 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-14 border-b border-[#E6DCC8]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-14 border-b border-[var(--zy-border,#E6DCC8)]">
           {/* Brand Column (2 columns span on large screens) */}
           <div className="lg:col-span-2 space-y-4">
             <Link
@@ -40,7 +40,7 @@ export function Footer() {
               className="flex items-center gap-2.5 group"
               aria-label="Zyrix Home"
             >
-              <div className="w-8 h-8 rounded-xl bg-[#C1502E] flex items-center justify-center text-white shadow-xs">
+              <div className="w-8 h-8 rounded-xl bg-[var(--zy-active,#C1502E)] flex items-center justify-center text-[var(--zy-btn-text,#FBF6EF)] shadow-xs transition-transform group-hover:scale-105">
                 <svg
                   width="18"
                   height="18"
@@ -54,12 +54,12 @@ export function Footer() {
                   />
                 </svg>
               </div>
-              <span className="text-xl font-serif font-bold tracking-tight text-[#2B2521]">
+              <span className="text-xl font-display font-bold tracking-tight text-[var(--zy-text,#2B2521)]">
                 Zyrix
               </span>
             </Link>
 
-            <p className="text-sm text-[#6B6058] font-sans leading-relaxed max-w-sm">
+            <p className="text-sm text-[var(--zy-muted,#6B6058)] font-sans leading-relaxed max-w-sm">
               The publication-grade machine learning platform pairing
               interactive 3D intuition with real code debugging and conceptual
               rigor.
@@ -67,11 +67,11 @@ export function Footer() {
 
             {/* Real WebGL2 Status Indicator */}
             <div className="pt-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FAF4ED] border border-[#E6DCC8] text-xs font-mono text-[#6B6058]">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--zy-surface,#FAF4ED)] border border-[var(--zy-border,#E6DCC8)] text-xs font-mono text-[var(--zy-muted,#6B6058)]">
                 <span
                   className={`w-2 h-2 rounded-full shrink-0 ${
                     webglStatus === "supported"
-                      ? "bg-[#16A34A]"
+                      ? "bg-[var(--zy-run,#16A34A)]"
                       : webglStatus === "unsupported"
                       ? "bg-[#D97706]"
                       : "bg-[#8C7E72] animate-pulse"
@@ -90,14 +90,14 @@ export function Footer() {
 
           {/* Product Links Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[#8C3A20]">
+            <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--zy-active-text,#8C3A20)]">
               Product
             </h4>
             <ul className="space-y-2.5 text-sm font-sans">
               <li>
                 <Link
                   href="/how-we-teach"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[var(--zy-border-focus)]"
                 >
                   How We Teach
                 </Link>
@@ -105,7 +105,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/curriculum"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[var(--zy-border-focus)]"
                 >
                   Curriculum
                 </Link>
@@ -113,7 +113,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/showcase"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[var(--zy-border-focus)]"
                 >
                   Format Showcase
                 </Link>
@@ -121,7 +121,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/pricing"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E]"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[var(--zy-border-focus)]"
                 >
                   Pricing
                 </Link>
@@ -131,14 +131,14 @@ export function Footer() {
 
           {/* Company & Community Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[#8C3A20]">
+            <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--zy-active-text,#8C3A20)]">
               Community
             </h4>
             <ul className="space-y-2.5 text-sm font-sans">
               <li>
                 <a
                   href="#"
-                  className="inline-flex items-center gap-1 text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="inline-flex items-center gap-1 text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   <span>GitHub</span>
                   <ArrowUpRight className="w-3 h-3 opacity-60" />
@@ -147,7 +147,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="inline-flex items-center gap-1 text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="inline-flex items-center gap-1 text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   <span>Discord Community</span>
                   <ArrowUpRight className="w-3 h-3 opacity-60" />
@@ -156,7 +156,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   About Zyrix
                 </a>
@@ -164,7 +164,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   Contact & Support
                 </a>
@@ -174,14 +174,14 @@ export function Footer() {
 
           {/* Legal Column */}
           <div className="space-y-3">
-            <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[#8C3A20]">
+            <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[var(--zy-active-text,#8C3A20)]">
               Legal
             </h4>
             <ul className="space-y-2.5 text-sm font-sans">
               <li>
                 <a
                   href="#"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   Privacy Policy
                 </a>
@@ -189,7 +189,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   Terms of Service
                 </a>
@@ -197,7 +197,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   Cookie Settings
                 </a>
@@ -205,7 +205,7 @@ export function Footer() {
               <li>
                 <a
                   href="#"
-                  className="text-[#6B6058] hover:text-[#2B2521] transition-colors"
+                  className="text-[var(--zy-muted,#6B6058)] hover:text-[var(--zy-text,#2B2521)] transition-colors"
                 >
                   Honor Code
                 </a>
@@ -215,10 +215,10 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright & Attribution */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-[#8C7E72]">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--zy-muted,#8C7E72)]">
           <p>© {currentYear} Zyrix Education Inc. All rights reserved.</p>
-          <p className="text-[11px] text-[#A89C8F]">
-            Designed with warm editorial aesthetics • Built for modern browsers
+          <p className="text-[11px] opacity-80">
+            Execution-highlight design system • Built for modern browsers
           </p>
         </div>
       </div>

@@ -11,8 +11,10 @@
   --color-border-warm: #E6DCC8;
   --color-surface-warm: #FAF4ED;
 
+  /* Typography Fallbacks */
   --font-serif: var(--font-fraunces), Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-instrument, var(--font-inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif));
+  --font-display: var(--font-bricolage, var(--font-display, var(--font-instrument, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif)));
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --shadow-warm-sm: 0 2px 8px -1px rgba(43, 37, 33, 0.05);
@@ -28,8 +30,143 @@
   --terracotta: #C1502E;
   --tint-warm: #F1E2CF;
   --border-warm: #E6DCC8;
+
+  /* Default marketing tokens fallback if used outside wrapper */
+  --zy-bg: #0B1020;
+  --zy-surface: #121A2E;
+  --zy-surface-2: #1A2440;
+  --zy-surface-elevated: #162038;
+  --zy-border: #26314F;
+  --zy-border-subtle: #1C2742;
+  --zy-border-focus: #FFB454;
+  --zy-text: #E9EEFB;
+  --zy-muted: #9AA7C7;
+  --zy-run: #35E0C2;
+  --zy-run-text: #35E0C2;
+  --zy-run-subtle: rgba(53, 224, 194, 0.12);
+  --zy-active: #FFB454;
+  --zy-active-text: #FFB454;
+  --zy-active-hover: #FFA230;
+  --zy-active-subtle: rgba(255, 180, 84, 0.14);
+  --zy-false: #FF6B81;
+  --zy-false-subtle: rgba(255, 107, 129, 0.14);
+  --zy-btn-text: #0B1020;
+  --zy-navbar-bg: rgba(11, 16, 32, 0.85);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCOPED MARKETING THEME WRAPPER (.zy-marketing)
+   Lesson pages do not use this class and remain in classic cream/terracotta.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Dark (Default) Palette */
+.zy-marketing {
+  --zy-bg: #0B1020;
+  --zy-surface: #121A2E;
+  --zy-surface-2: #1A2440;
+  --zy-surface-elevated: #162038;
+  --zy-border: #26314F;
+  --zy-border-subtle: #1C2742;
+  --zy-border-focus: #FFB454;
+  --zy-text: #E9EEFB;
+  --zy-muted: #9AA7C7;
+  --zy-run: #35E0C2;
+  --zy-run-text: #35E0C2;
+  --zy-run-subtle: rgba(53, 224, 194, 0.12);
+  --zy-active: #FFB454;
+  --zy-active-text: #FFB454;
+  --zy-active-hover: #FFA230;
+  --zy-active-subtle: rgba(255, 180, 84, 0.14);
+  --zy-false: #FF6B81;
+  --zy-false-subtle: rgba(255, 107, 129, 0.14);
+  --zy-btn-text: #0B1020;
+  --zy-navbar-bg: rgba(11, 16, 32, 0.85);
+
+  /* Override classic tokens inside marketing scope */
+  --cream-bg: var(--zy-bg);
+  --ink: var(--zy-text);
+  --ink-muted: var(--zy-muted);
+  --terracotta: var(--zy-active);
+  --tint-warm: var(--zy-surface-2);
+  --border-warm: var(--zy-border);
+
+  background-color: var(--zy-bg);
+  color: var(--zy-text);
+  font-family: var(--font-instrument), var(--font-sans), sans-serif;
+  color-scheme: dark;
+}
+
+/* Light Theme Variant */
+.zy-marketing[data-theme="light"] {
+  --zy-bg: #F4F6FB;
+  --zy-surface: #FFFFFF;
+  --zy-surface-2: #E9EDF7;
+  --zy-surface-elevated: #FFFFFF;
+  --zy-border: #D5DCEC;
+  --zy-border-subtle: #E2E8F4;
+  --zy-border-focus: #9A5A00;
+  --zy-text: #101728;
+  --zy-muted: #55607C;
+  --zy-run: #35E0C2;
+  --zy-run-text: #0B7F6E;
+  --zy-run-subtle: rgba(53, 224, 194, 0.18);
+  --zy-active: #FFB454;
+  --zy-active-text: #9A5A00;
+  --zy-active-hover: #E69500;
+  --zy-active-subtle: rgba(255, 180, 84, 0.22);
+  --zy-false: #C2364E;
+  --zy-false-subtle: rgba(194, 54, 78, 0.15);
+  --zy-btn-text: #101728;
+  --zy-navbar-bg: rgba(244, 246, 251, 0.90);
+
+  --cream-bg: var(--zy-bg);
+  --ink: var(--zy-text);
+  --ink-muted: var(--zy-muted);
+  --terracotta: var(--zy-active);
+  --tint-warm: var(--zy-surface-2);
+  --border-warm: var(--zy-border);
+
+  background-color: var(--zy-bg);
+  color: var(--zy-text);
+  color-scheme: light;
+}
+
+/* Explicit Dark Override */
+.zy-marketing[data-theme="dark"] {
+  --zy-bg: #0B1020;
+  --zy-surface: #121A2E;
+  --zy-surface-2: #1A2440;
+  --zy-surface-elevated: #162038;
+  --zy-border: #26314F;
+  --zy-border-subtle: #1C2742;
+  --zy-border-focus: #FFB454;
+  --zy-text: #E9EEFB;
+  --zy-muted: #9AA7C7;
+  --zy-run: #35E0C2;
+  --zy-run-text: #35E0C2;
+  --zy-run-subtle: rgba(53, 224, 194, 0.12);
+  --zy-active: #FFB454;
+  --zy-active-text: #FFB454;
+  --zy-active-hover: #FFA230;
+  --zy-active-subtle: rgba(255, 180, 84, 0.14);
+  --zy-false: #FF6B81;
+  --zy-false-subtle: rgba(255, 107, 129, 0.14);
+  --zy-btn-text: #0B1020;
+  --zy-navbar-bg: rgba(11, 16, 32, 0.85);
+
+  --cream-bg: var(--zy-bg);
+  --ink: var(--zy-text);
+  --ink-muted: var(--zy-muted);
+  --terracotta: var(--zy-active);
+  --tint-warm: var(--zy-surface-2);
+  --border-warm: var(--zy-border);
+
+  background-color: var(--zy-bg);
+  color: var(--zy-text);
+  color-scheme: dark;
+}
+
+/* Base resets & document defaults */
 html {
   scroll-behavior: smooth;
   background-color: #FBF6EF;
@@ -55,17 +192,17 @@ body {
   }
 }
 
-/* Custom subtle scrollbar in warm tones */
+/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #FBF6EF;
+  background: var(--zy-bg, #FBF6EF);
 }
 ::-webkit-scrollbar-thumb {
-  background: #E6DCC8;
+  background: var(--zy-border, #E6DCC8);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D9CEB8;
+  background: var(--zy-border-focus, #D9CEB8);
 }

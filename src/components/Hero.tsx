@@ -1,120 +1,120 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { ArrowRight, Compass, Box, Terminal, Laptop } from "lucide-react";
-import { GradientDescentDemo } from "./GradientDescentDemo";
+import { ArrowRight, Box, Terminal, Laptop, Compass } from "lucide-react";
+import { LiveExecutionPanel } from "./LiveExecutionPanel";
+import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
+
+function subscribeMounted(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("DOMContentLoaded", callback);
+  return () => window.removeEventListener("DOMContentLoaded", callback);
+}
+
+function getMountedSnapshot() {
+  return typeof window !== "undefined";
+}
 
 export function Hero() {
-  // Propose 3 headline variants per architectural decision #3
-  const headlineVariants = [
-    "Every Concept, Taught the Way It Actually Makes Sense",
-    "Stop Memorizing Formulas. Build Real Mathematical Intuition.",
-    "The Deep Machinery of Data Science, Finally Made Tangible.",
-  ];
+  const reducedMotion = usePrefersReducedMotion();
+  const mounted = useSyncExternalStore(subscribeMounted, getMountedSnapshot, () => false);
 
-  const [activeHeadlineIndex, setActiveHeadlineIndex] = useState(0);
-
-  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith("#")) {
-      e.preventDefault();
-      const targetId = href.substring(1);
-      const elem = document.getElementById(targetId);
-      if (elem) {
-        elem.scrollIntoView({ behavior: "smooth" });
-      } else {
-        // Target section does not exist yet in Phase 1; gracefully update URL without error
-        window.history.pushState(null, "", href);
-      }
-    }
-  };
+  const headlineWords = ["Don't", "just", "read", "code.", "Watch", "it", "run."];
 
   return (
-    <section className="relative pt-12 pb-20 md:pt-16 md:pb-28 overflow-hidden">
+    <section className="relative pt-12 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Editorial Hero Header */}
-        <div className="text-center max-w-4xl mx-auto space-y-6">
-          {/* Warm Tinted Pill Badge (No glow) */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F1E2CF] border border-[#E6DCC8] text-xs font-medium text-[#8C3A20] shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#C1502E]" />
-            <span>7 ways to actually understand data science</span>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+          {/* Left Column: Asymmetric Left-Aligned Headline Block */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
+            {/* Eyebrow Chip */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--zy-surface-2)] border border-[var(--zy-border)] text-xs font-mono font-medium text-[var(--zy-active-text)] shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--zy-run)] animate-pulse" />
+              <span className="tracking-wide uppercase text-[11px]">
+                Python to machine learning, visualised
+              </span>
+            </div>
 
-          {/* Large Serif Display Headline */}
-          <div className="relative">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-[#2B2521] tracking-tight leading-[1.12]">
-              {headlineVariants[activeHeadlineIndex]}
+            {/* Headline with 80ms Staggered Slide-up from Mask */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-[var(--zy-text)] tracking-tight leading-[1.08] text-balance">
+              {headlineWords.map((word, idx) => (
+                <span
+                  key={idx}
+                  className="inline-block overflow-hidden mr-[0.24em] align-bottom pb-1"
+                >
+                  <span
+                    className={`inline-block transition-transform duration-500 ease-out ${
+                      mounted || reducedMotion
+                        ? "translate-y-0 opacity-100"
+                        : "translate-y-full opacity-0"
+                    }`}
+                    style={{
+                      transitionDelay: reducedMotion ? "0ms" : `${idx * 80}ms`,
+                    }}
+                  >
+                    {word}
+                  </span>
+                </span>
+              ))}
             </h1>
 
-            {/* Editorial Headline Variant Selector (Optional subtle toggle) */}
-            <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-[#6B6058]">
-              <span className="hidden sm:inline">Headline Variant:</span>
-              {headlineVariants.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveHeadlineIndex(idx)}
-                  className={`px-2 py-0.5 rounded-md border text-[11px] font-sans transition-colors ${
-                    activeHeadlineIndex === idx
-                      ? "bg-[#C1502E] text-white border-[#C1502E] font-medium"
-                      : "bg-[#FAF4ED] text-[#6B6058] border-[#E6DCC8] hover:text-[#2B2521]"
-                  }`}
-                  aria-label={`Select headline variant ${idx + 1}`}
-                >
-                  Variant {idx + 1}
-                </button>
-              ))}
+            {/* Subheadline in Instrument Sans */}
+            <p className="text-base sm:text-lg md:text-xl text-[var(--zy-muted)] font-sans leading-relaxed max-w-xl">
+              Zyrix turns every concept into something you can see, step through
+              and break on purpose. It runs in your browser, with nothing to
+              install.
+            </p>
+
+            {/* Action CTAs */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <Link
+                href="/learn/module-1/episode-1"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-base font-semibold bg-[var(--zy-active)] hover:bg-[var(--zy-active-hover)] text-[var(--zy-btn-text)] shadow-md hover:shadow-lg transition-all duration-200 active:scale-98 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[var(--zy-border-focus)] focus-visible:ring-offset-2"
+              >
+                <span>Run your first line</span>
+                <ArrowRight className="w-4 h-4 ml-0.5" />
+              </Link>
+
+              <Link
+                href="/how-we-teach"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-base font-medium bg-[var(--zy-surface)] hover:bg-[var(--zy-surface-2)] text-[var(--zy-text)] border border-[var(--zy-border)] shadow-xs transition-all duration-200 active:scale-98 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[var(--zy-border-focus)] focus-visible:ring-offset-2"
+              >
+                <Compass className="w-4 h-4 text-[var(--zy-run)]" />
+                <span>See how we teach</span>
+              </Link>
+            </div>
+
+            {/* Terminal Status Tags */}
+            <div className="pt-2 flex flex-wrap items-center gap-2.5 text-xs font-mono text-[var(--zy-muted)]">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--zy-surface)] border border-[var(--zy-border)]">
+                <Box className="w-3.5 h-3.5 text-[var(--zy-run)]" />
+                <span className="text-[var(--zy-text)]/90">Live 3D visuals</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--zy-surface)] border border-[var(--zy-border)]">
+                <Terminal className="w-3.5 h-3.5 text-[var(--zy-active)]" />
+                <span className="text-[var(--zy-text)]/90">Debug challenges</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--zy-surface)] border border-[var(--zy-border)]">
+                <Laptop className="w-3.5 h-3.5 text-[var(--zy-run)]" />
+                <span className="text-[var(--zy-text)]/90">Runs in your browser</span>
+              </div>
             </div>
           </div>
 
-          {/* Subheadline in Sans-Serif */}
-          <p className="text-lg sm:text-xl text-[#6B6058] font-sans max-w-2xl mx-auto leading-relaxed">
-            Most courses force every topic through the same lecture format. We match
-            each idea to the medium where it clicks best — interactive 3D simulations,
-            hands-on debugging, visual derivations, and real production datasets.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-            <a
-              href="#sandbox"
-              onClick={(e) => handleSmoothScroll(e, "#sandbox")}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-base font-semibold bg-[#C1502E] hover:bg-[#A84224] text-[#FBF6EF] shadow-sm hover:shadow transition-all duration-200 active:scale-98 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2"
-            >
-              <span>Try It Live</span>
-              <ArrowRight className="w-4 h-4 ml-0.5" />
-            </a>
-
-            <Link
-              href="/how-we-teach"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-base font-medium bg-[#FAF4ED] hover:bg-[#F1E2CF] text-[#2B2521] border border-[#E6DCC8] shadow-xs transition-all duration-200 active:scale-98 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#C1502E] focus-visible:ring-offset-2"
-            >
-              <Compass className="w-4 h-4 text-[#C1502E]" />
-              <span>See How We Teach</span>
-            </Link>
+          {/* Right Column: Live Execution Panel */}
+          <div
+            className={`lg:col-span-5 w-full transition-all duration-700 ease-out ${
+              mounted || reducedMotion
+                ? "opacity-100 scale-100 translate-y-0"
+                : "opacity-0 scale-95 translate-y-4"
+            }`}
+            style={{
+              transitionDelay: reducedMotion ? "0ms" : "260ms",
+            }}
+          >
+            <LiveExecutionPanel />
           </div>
-
-          {/* Truth-Only Stat Row */}
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs text-[#6B6058] font-sans">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F1E2CF]/60 border border-[#E6DCC8]">
-              <Box className="w-3.5 h-3.5 text-[#C1502E]" />
-              <span className="font-medium text-[#2B2521]">Live 3D Visualizations</span>
-            </div>
-            <span className="hidden sm:inline text-[#E6DCC8]">•</span>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F1E2CF]/60 border border-[#E6DCC8]">
-              <Terminal className="w-3.5 h-3.5 text-[#C1502E]" />
-              <span className="font-medium text-[#2B2521]">Real Debug Challenges</span>
-            </div>
-            <span className="hidden sm:inline text-[#E6DCC8]">•</span>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F1E2CF]/60 border border-[#E6DCC8]">
-              <Laptop className="w-3.5 h-3.5 text-[#C1502E]" />
-              <span className="font-medium text-[#2B2521]">Runs in Your Browser</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 3D Gradient Descent Demo Showcase Container */}
-        <div id="sandbox" className="mt-12 sm:mt-16 max-w-5xl mx-auto">
-          <GradientDescentDemo />
         </div>
       </div>
     </section>
